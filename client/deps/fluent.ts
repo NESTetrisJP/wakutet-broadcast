@@ -1,0 +1,43 @@
+import {
+  fluentButton,
+  fluentCard,
+  fluentCheckbox,
+  fluentDialog,
+  fluentNumberField,
+  fluentProgressRing,
+  fluentRadio,
+  fluentRadioGroup,
+  fluentTab,
+  fluentTabPanel,
+  fluentTabs,
+  fluentTextField,
+  provideFluentDesignSystem,
+} from "https://esm.sh/@fluentui/web-components@2.5.13";
+provideFluentDesignSystem().register(
+  fluentButton(),
+  fluentCard(),
+  fluentCheckbox(),
+  fluentDialog(),
+  fluentNumberField(),
+  fluentProgressRing(),
+  fluentRadio(),
+  fluentRadioGroup(),
+  fluentTab(),
+  fluentTabPanel(),
+  fluentTabs(),
+  fluentTextField(),
+);
+export {
+  Button as FluentButton,
+  Card as FluentCard,
+  // Checkbox as FluentCheckbox, // TODO
+  Dialog as FluentDialog,
+  NumberField as FluentNumberField,
+  ProgressRing as FluentProgressRing,
+  Radio as FluentRadio,
+  RadioGroup as FluentRadioGroup,
+  Tab as FluentTab,
+  TabPanel as FluentTabPanel,
+  Tabs as FluentTabs,
+  TextField as FluentTextField,
+} from "https://esm.sh/@fluentui/web-components@2.5.13";
