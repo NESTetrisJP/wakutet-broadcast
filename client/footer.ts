@@ -6,7 +6,7 @@ export class WakutetoFooterElement extends LitElement {
   .container {
     width: 1920px;
     height: 80px;
-    background: white;
+    background: url("images/footer.png");
   }
   `;
 
