@@ -42,6 +42,7 @@ const playerDatabaseReplicant = await server.getReplicant("playerDatabase");
 playerDatabaseReplicant.setValue([
   {
     name: "コーリャン",
+    englishName: "Koryan",
     profileEntries: [
       ["職業", "プログラマー\nテトリスの鬼"],
       ["自己ベスト", "1,287,000"],
@@ -51,7 +52,8 @@ playerDatabaseReplicant.setValue([
     ],
   },
   {
-    name: "りょくちゃ",
+    name: "Greentea",
+    englishName: null,
     profileEntries: [
       ["職業", "プログラマー💩"],
       ["自己ベスト", "1,190,000"],

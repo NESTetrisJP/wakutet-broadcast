@@ -2,8 +2,8 @@ import { ProfileData } from "../../common/type_definition.ts";
 import { commonColors } from "../common_values.js";
 import { css, customElement, html, LitElement, map, property } from "../deps/lit.ts";
 
-@customElement("wakuteto-profile-card")
-export class WakutetoProfileCardElement extends LitElement {
+@customElement("wakutet-profile-card")
+export class WakutetProfileCardElement extends LitElement {
   static styles = css`
   .container {
     width: 356px;

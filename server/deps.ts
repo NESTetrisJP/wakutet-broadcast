@@ -6,9 +6,9 @@ export {
   default as OBSWebSocket,
   type OBSRequestTypes,
   type OBSResponseTypes,
-} from "https://esm.sh/obs-websocket-js@5.0.2";
+} from "https://esm.sh/v117/obs-websocket-js@5.0.2";
 
 // promise-queue dependency
 export {
   default as Queue
-} from "https://esm.sh/promise-queue@2.2.5";
+} from "https://esm.sh/v117/promise-queue@2.2.5";

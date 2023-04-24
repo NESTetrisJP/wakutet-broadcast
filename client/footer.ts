@@ -1,7 +1,7 @@
 import { css, customElement, html, LitElement } from "./deps/lit.ts";
 
-@customElement("wakuteto-footer")
-export class WakutetoFooterElement extends LitElement {
+@customElement("wakutet-footer")
+export class WakutetFooterElement extends LitElement {
   static styles = css`
   .container {
     width: 1920px;
