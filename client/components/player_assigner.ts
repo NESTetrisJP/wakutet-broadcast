@@ -25,6 +25,7 @@ export class WakutetoPlayerAssignerElement extends LitElement {
     super();
   }
 
+  // @ts-ignore: ?
   @consume({ context: denocgContext })
   private _denocgContext!: DenoCGContext;
 
@@ -52,6 +53,9 @@ export class WakutetoPlayerAssignerElement extends LitElement {
     this._playerProfilesReplicant = await client.getReplicant("playerProfiles");
     this._playerProfileHiddenEntriesReplicant = await client.getReplicant("playerProfileHiddenEntries");
     this._playerProfileHiddenEntries = this._playerProfileHiddenEntriesReplicant.getValue() ?? {};
+
+    this._assignPlayer(-1, 0);
+    this._assignPlayer(-1, 1);
   }
 
   private _constructProfileData(databaseEntry: PlayerDatabaseEntry | null): ProfileData {

@@ -28,7 +28,11 @@ const currentSceneNameReplicant = await server.getReplicant("currentSceneName");
 currentSceneNameReplicant.subscribe(async (value) => {
   if (!value) return;
   await sceneChangeQueue.add(async () => {
-    await obs.call("SetCurrentProgramScene", { sceneName: value });
+    try {
+      await obs.call("SetCurrentProgramScene", { sceneName: value });
+    } catch (e) {
+      console.error(e);
+    }
     await new Promise((resolve) => setTimeout(resolve, 500));
   });
 });

@@ -12,7 +12,7 @@ import {
   fluentTabs,
   fluentTextField,
   provideFluentDesignSystem,
-} from "https://esm.sh/@fluentui/web-components@2.5.13";
+} from "https://esm.sh/v117/@fluentui/web-components@2.5.13";
 provideFluentDesignSystem().register(
   fluentButton(),
   fluentCard(),
@@ -40,4 +40,4 @@ export {
   TabPanel as FluentTabPanel,
   Tabs as FluentTabs,
   TextField as FluentTextField,
-} from "https://esm.sh/@fluentui/web-components@2.5.13";
+} from "https://esm.sh/v117/@fluentui/web-components@2.5.13";
