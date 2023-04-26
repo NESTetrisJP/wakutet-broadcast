@@ -41,6 +41,7 @@ playerNamesReplicant.subscribe((value) => {
   ];
   value.forEach((name, i) => {
     if (playerNames.length <= i) return;
+    // TODO: 全角にする
     playerNames[i].innerText = name.original;
     if (name.english) {
       const english = document.createElement("span");

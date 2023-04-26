@@ -1,6 +1,7 @@
 type EmptyObject = Record<keyof unknown, never>;
 
 export type PlayerDatabaseEntry = {
+  id: number;
   name: string;
   englishName: string | null;
   qualifierBestScore: number;
@@ -39,5 +40,7 @@ export type TypeDefinition = {
 
   messages: {};
 
-  requests: {};
+  requests: {
+    fetchPlayerDatabase: EmptyObject;
+  };
 };

@@ -42,20 +42,30 @@ export class WakutetPlayerAssignerElement extends LitElement {
   private _denocgContext!: DenoCGContext;
 
   @state()
+  private _fetchingPlayerDatabase = false;
+
+  @state()
   private _playerDatabase: PlayerDatabaseEntry[] = [];
   @state()
-  private _databaseSelectedIndex = -1;
+  private _databaseSelectedId = -1;
   @state()
   private _playerProfileHiddenEntries: Record<string, string[]> = {};
 
-  @state()
-  private _assignedPlayerRowIndices = [-1, -1];
-
-  private _playerNamesReplicant!: denocg.Replicant<NameData[]>;
-  private _playerProfilesReplicant!: denocg.Replicant<ProfileData[]>;
+  private _playerNamesReplicant!: denocg.Replicant<[NameData, NameData]>;
+  private _playerProfilesReplicant!: denocg.Replicant<
+    [ProfileData, ProfileData]
+  >;
   private _playerProfileHiddenEntriesReplicant!: denocg.Replicant<
     Record<string, string[]>
   >;
+
+  private _playerNames: [NameData, NameData] = [null, null].map((_) => ({
+    original: "",
+    english: "",
+  })) as [NameData, NameData];
+  private _playerProfiles: [ProfileData, ProfileData] = [null, null].map(
+    (_) => ({ name: "", entries: [] as [string, string][] }),
+  ) as [ProfileData, ProfileData];
 
   async firstUpdated() {
     const client = await this._denocgContext.getClient();
@@ -68,11 +78,33 @@ export class WakutetPlayerAssignerElement extends LitElement {
     this._playerProfileHiddenEntriesReplicant = await client.getReplicant(
       "playerProfileHiddenEntries",
     );
-    this._playerProfileHiddenEntries =
-      this._playerProfileHiddenEntriesReplicant.getValue() ?? {};
+    this._playerNamesReplicant.subscribe((value) => {
+      this._playerNames = value ??
+        [null, null].map((_) => ({ original: "", english: "" })) as [
+          NameData,
+          NameData,
+        ];
+    });
+    this._playerProfilesReplicant.subscribe((value) => {
+      this._playerProfiles = value ??
+        [null, null].map((_) => ({
+          name: "",
+          entries: [] as [string, string][],
+        })) as [ProfileData, ProfileData];
+    });
+    this._playerProfileHiddenEntriesReplicant.subscribe((value) => {
+      this._playerProfileHiddenEntries = value ?? {};
+    });
+  }
 
-    this._assignPlayer(-1, 0);
-    this._assignPlayer(-1, 1);
+  private async _fetchPlayerDatabase() {
+    try {
+      this._fetchingPlayerDatabase = true;
+      const client = await this._denocgContext.getClient();
+      await client.requestToServer("fetchPlayerDatabase");
+    } finally {
+      this._fetchingPlayerDatabase = false;
+    }
   }
 
   private _constructNameData(
@@ -96,25 +128,27 @@ export class WakutetPlayerAssignerElement extends LitElement {
     };
   }
 
-  private async _selectRow(rowIndex: number) {
+  private async _selectRow(id: number) {
     // TODO: 仮対処 行を切り替えたときにチェックが切り替わらない
-    this._databaseSelectedIndex = -1;
+    this._databaseSelectedId = -1;
     await new Promise((res) => setTimeout(res, 0));
-    this._databaseSelectedIndex = rowIndex;
+    this._databaseSelectedId = id;
   }
 
-  private _assignPlayer(rowIndex: number, playerIndex: number) {
-    this._assignedPlayerRowIndices[playerIndex] = rowIndex;
-    this._playerNamesReplicant.setValue(
-      this._assignedPlayerRowIndices.map((i) =>
-        this._constructNameData(this._playerDatabase[i])
-      ),
+  private _assignPlayer(id: number, playerIndex: number) {
+    const playerNames = [...this._playerNames] as [NameData, NameData];
+    const playerProfiles = [...this._playerProfiles] as [
+      ProfileData,
+      ProfileData,
+    ];
+    playerNames[playerIndex] = this._constructNameData(
+      this._playerDatabase.find((e) => e.id == id) ?? null,
     );
-    this._playerProfilesReplicant.setValue(
-      this._assignedPlayerRowIndices.map((i) =>
-        this._constructProfileData(this._playerDatabase[i])
-      ),
+    playerProfiles[playerIndex] = this._constructProfileData(
+      this._playerDatabase.find((e) => e.id == id) ?? null,
     );
+    this._playerNamesReplicant.setValue(playerNames);
+    this._playerProfilesReplicant.setValue(playerProfiles);
   }
 
   private _getProfileEntryVisibility(
@@ -144,28 +178,29 @@ export class WakutetPlayerAssignerElement extends LitElement {
         modifiedEntries.push(entryName);
       }
     }
-    this._playerProfileHiddenEntries = {
+    this._playerProfileHiddenEntriesReplicant.setValue({
       ...this._playerProfileHiddenEntries,
       [playerName]: modifiedEntries,
-    };
-    this._playerProfileHiddenEntriesReplicant.setValue(
-      this._playerProfileHiddenEntries,
-    );
+    });
   }
 
   render() {
-    const selectedDatabaseEntry =
-      this._playerDatabase[this._databaseSelectedIndex];
+    const selectedDatabaseEntry = this._playerDatabase.find((e) =>
+      e.id == this._databaseSelectedId
+    );
     const previewProfile = selectedDatabaseEntry != null
       ? this._constructProfileData(selectedDatabaseEntry)
       : null;
 
     return html`
     <div class="container">
+      <fluent-button @click=${() =>
+      this
+        ._fetchPlayerDatabase()} ?disabled=${this._fetchingPlayerDatabase}>プレイヤー情報更新</fluent-button>
       ${
-      map(this._playerDatabase, (e, i) =>
+      map(this._playerDatabase, (e) =>
         html`
-      <div @click=${() => this._selectRow(i)}>
+      <div @click=${() => this._selectRow(e.id)}>
         ${e.name}
       </div>
       `)
@@ -197,11 +232,11 @@ export class WakutetPlayerAssignerElement extends LitElement {
         </div>
       </div>
       <fluent-button @click=${(ev: Event) => {
-      this._assignPlayer(this._databaseSelectedIndex, 0);
+      this._assignPlayer(this._databaseSelectedId, 0);
       ev.stopPropagation();
     }}>1P</fluent-button>
       <fluent-button @click=${(ev: Event) => {
-      this._assignPlayer(this._databaseSelectedIndex, 1);
+      this._assignPlayer(this._databaseSelectedId, 1);
       ev.stopPropagation();
     }}>2P</fluent-button>
     </div>

@@ -39,4 +39,6 @@ currentSceneNameReplicant.subscribe(async (value) => {
 });
 
 const playerDatabaseReplicant = await server.getReplicant("playerDatabase");
-playerDatabaseReplicant.setValue(await fetchPlayerDatabase());
+server.registerRequestHandler("fetchPlayerDatabase", async () => {
+  playerDatabaseReplicant.setValue(await fetchPlayerDatabase());
+});
