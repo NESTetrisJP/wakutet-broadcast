@@ -9,6 +9,4 @@ export {
 } from "https://esm.sh/v117/obs-websocket-js@5.0.2";
 
 // promise-queue dependency
-export {
-  default as Queue
-} from "https://esm.sh/v117/promise-queue@2.2.5";
+export { default as Queue } from "https://esm.sh/v117/promise-queue@2.2.5";

@@ -1,6 +1,13 @@
 import { ProfileData } from "../../common/type_definition.ts";
 import { commonColors } from "../common_values.js";
-import { css, customElement, html, LitElement, map, property } from "../deps/lit.ts";
+import {
+  css,
+  customElement,
+  html,
+  LitElement,
+  map,
+  property,
+} from "../deps/lit.ts";
 
 @customElement("wakutet-profile-card")
 export class WakutetProfileCardElement extends LitElement {
@@ -66,7 +73,14 @@ export class WakutetProfileCardElement extends LitElement {
     <div class="container">
       <div class="name">${profile.name}</div>
       <dl>
-      ${map(profile.entries, e => html`<dt>${e[0]}</dt><dd>${e[1].split("\n").map((line, i, arr) => i == arr.length - 1 ? html`${line}` : html`${line}<br>`)}</dd>`)}
+      ${
+      map(profile.entries, (e) =>
+        html`<dt>${e[0]}</dt><dd>${
+          e[1].split("\n").map((line, i, arr) =>
+            i == arr.length - 1 ? html`${line}` : html`${line}<br>`
+          )
+        }</dd>`)
+    }
       </dl>
     </div>
     `;

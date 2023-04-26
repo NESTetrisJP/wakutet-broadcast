@@ -1,8 +1,9 @@
 import { TypeDefinition } from "./common/type_definition.ts";
-import { Queue, denocg } from "./server/deps.ts";
+import { denocg, Queue } from "./server/deps.ts";
 import { OBSController } from "./server/obs_controller.ts";
 import { serve } from "https://deno.land/std@0.175.0/http/server.ts";
 import { serveDir } from "https://deno.land/std@0.175.0/http/file_server.ts";
+import { fetchPlayerDatabase } from "./server/backend.ts";
 
 const config: denocg.ServerConfig<TypeDefinition> = {
   socketPort: 8515,
@@ -37,30 +38,5 @@ currentSceneNameReplicant.subscribe(async (value) => {
   });
 });
 
-// temp
 const playerDatabaseReplicant = await server.getReplicant("playerDatabase");
-playerDatabaseReplicant.setValue([
-  {
-    name: "コーリャン",
-    englishName: "Koryan",
-    profileEntries: [
-      ["職業", "プログラマー\nテトリスの鬼"],
-      ["自己ベスト", "1,287,000"],
-      ["過去の戦績", "CTWC 2016 4位\nCTWC 2018 4位\nCTWC 2019 2位"],
-      ["最近ハマってるゲーム", "虹色町\nCookie Clicker"],
-      ["コメント", "がんばる折り返しテストテストテストテスト"],
-    ],
-  },
-  {
-    name: "Greentea",
-    englishName: null,
-    profileEntries: [
-      ["職業", "プログラマー💩"],
-      ["自己ベスト", "1,190,000"],
-      ["過去の戦績", "CTWC 2018 3位"],
-      ["Twitter", "@suitougreentea"],
-      ["ココイチのトッピング", "ロースカツ\nパリパリチキン"],
-      ["コメント", "わくわく"],
-    ],
-  }
-]);
+playerDatabaseReplicant.setValue(await fetchPlayerDatabase());

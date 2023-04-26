@@ -19,6 +19,8 @@ export const denocgContext = createContext<DenoCGContext>(
 );
 
 export const createDenoCGContext = (): DenoCGContext => {
-  const promise = new Promise<denocg.Client<TypeDefinition>>((resolve) => { denocg.getClient<TypeDefinition>().then(client => resolve(client)); })
+  const promise = new Promise<denocg.Client<TypeDefinition>>((resolve) => {
+    denocg.getClient<TypeDefinition>().then((client) => resolve(client));
+  });
   return new DenoCGContext(promise);
 };
