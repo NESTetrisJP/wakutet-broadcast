@@ -6,6 +6,7 @@ import {
 import { denocg } from "./deps/denocg.ts";
 import { WakutetProfileCardElement } from "./components/profile_card.ts";
 import "./components/profile_card.ts";
+import { toFullwidthName } from "./common.ts";
 
 const client = await denocg.getClient<TypeDefinition>({
   socketHostname: "localhost",
@@ -41,8 +42,7 @@ playerNamesReplicant.subscribe((value) => {
   ];
   value.forEach((name, i) => {
     if (playerNames.length <= i) return;
-    // TODO: 全角にする
-    playerNames[i].innerText = name.original;
+    playerNames[i].innerText = toFullwidthName(name.original);
     if (name.english) {
       const english = document.createElement("span");
       english.className = "english";

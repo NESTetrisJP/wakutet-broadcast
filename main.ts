@@ -1,4 +1,8 @@
-import { TypeDefinition } from "./common/type_definition.ts";
+import {
+  PlayerDatabaseEntry,
+  QualifierRankingEntry,
+  TypeDefinition,
+} from "./common/type_definition.ts";
 import { denocg, Queue } from "./server/deps.ts";
 import { OBSController } from "./server/obs_controller.ts";
 import { serve } from "https://deno.land/std@0.175.0/http/server.ts";
@@ -24,6 +28,36 @@ const obsConfigText = await Deno.readTextFile("./obs-websocket-conf.json");
 const obsConfig = JSON.parse(obsConfigText);
 const obs = new OBSController(obsConfig.address, obsConfig.password);
 
+const getQualifierRanking = (
+  database: PlayerDatabaseEntry[],
+): QualifierRankingEntry[] => {
+  const sorted = database.toSorted((a, b) => {
+    if (a.qualifierNumMaxout != b.qualifierNumMaxout) {
+      return b.qualifierNumMaxout - a.qualifierNumMaxout;
+    }
+    return b.qualifierBestScore - a.qualifierBestScore;
+  });
+  let j = 0;
+  const result: QualifierRankingEntry[] = [];
+  sorted.forEach((e, i) => {
+    if (e.qualifierBestScore == 0 && e.qualifierNumMaxout == 0) return;
+    if (
+      e.qualifierBestScore != sorted[j].qualifierBestScore ||
+      e.qualifierNumMaxout != sorted[j].qualifierNumMaxout
+    ) {
+      j = i;
+    }
+    result.push({
+      place: j + 1,
+      name: e.name,
+      englishName: e.englishName,
+      bestScore: e.qualifierBestScore,
+      numMaxout: e.qualifierNumMaxout,
+    });
+  });
+  return result;
+};
+
 const sceneChangeQueue = new Queue(1);
 const currentSceneNameReplicant = await server.getReplicant("currentSceneName");
 currentSceneNameReplicant.subscribe(async (value) => {
@@ -39,6 +73,9 @@ currentSceneNameReplicant.subscribe(async (value) => {
 });
 
 const playerDatabaseReplicant = await server.getReplicant("playerDatabase");
+const qualifierRankingReplicant = await server.getReplicant("qualifierRanking");
 server.registerRequestHandler("fetchPlayerDatabase", async () => {
-  playerDatabaseReplicant.setValue(await fetchPlayerDatabase());
+  const playerDatabase = await fetchPlayerDatabase();
+  playerDatabaseReplicant.setValue(playerDatabase);
+  qualifierRankingReplicant.setValue(getQualifierRanking(playerDatabase));
 });

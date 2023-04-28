@@ -24,6 +24,14 @@ export type ProfileData = {
   entries: [string, string][];
 };
 
+export type QualifierRankingEntry = {
+  place: number;
+  name: string;
+  englishName: string | null;
+  bestScore: number;
+  numMaxout: number;
+};
+
 export type TypeDefinition = {
   replicants: {
     currentSceneName: string;
@@ -32,6 +40,7 @@ export type TypeDefinition = {
     playerHearts: [HeartsData, HeartsData];
     playerProfiles: [ProfileData, ProfileData];
     playerProfilesVisible: boolean;
+    qualifierRanking: QualifierRankingEntry[];
 
     // dashboard only
     playerDatabase: PlayerDatabaseEntry[];

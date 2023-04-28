@@ -1,3 +1,13 @@
+@font-face {
+  font-family: 'Press Start K';
+  src: url('fonts/prstartk_nes_tetris_8.ttf');
+}
+
+@font-face {
+  font-family: 'Misaki Gothic';
+  src: url('fonts/misaki_gothic.ttf');
+}
+
 body {
   margin: 0;
 }
