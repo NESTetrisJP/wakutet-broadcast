@@ -14,14 +14,43 @@ import "../deps/fluent.ts";
 import { HeartsData, NameData } from "../../common/type_definition.ts";
 import "./profile_card.ts";
 import { FluentSelect } from "../deps/fluent.ts";
+import "./section.ts";
 
 @customElement("wakutet-stage-controller")
 export class WakutetStageControllerElement extends LitElement {
   static styles = css`
-  .container {
+  .grid {
+    display: grid;
+    grid-template-columns: 200px 200px;
+    gap: 0 20px;
+  }
+  .name:nth-child(1) {
+    grid-area: 1 / 1;
+  }
+  .name:nth-child(2) {
+    grid-area: 1 / 2;
+  }
+  .hearts-controller:nth-child(1) {
+    grid-area: 2 / 1;
+  }
+  .hearts-controller:nth-child(2) {
+    grid-area: 2 / 2;
+  }
+
+  .name {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .hearts-controller {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .heart {
+    font-size: 20px;
     color: gray;
   }
   .heart-lit {
@@ -99,48 +128,62 @@ export class WakutetStageControllerElement extends LitElement {
       5,
     );
     return html`
-    <div class="container">
-      <fluent-select value=${numMaxHearts} @change=${(ev: Event) =>
-      this._setNumMaxHearts(Number((ev.target as FluentSelect).value))}>
-        <fluent-option value="0">0 (非表示)</fluent-option>
-        <fluent-option value="1">1</fluent-option>
-        <fluent-option value="2">2</fluent-option>
-        <fluent-option value="3">3</fluent-option>
-        <fluent-option value="4">4</fluent-option>
-        <fluent-option value="5">5</fluent-option>
-      </fluent-select>
-      <div>
-        ${
-      map(this._playerHearts, (e, i) =>
-        html`
+    <wakutet-section>
+      <div slot="header">現在のプレイヤー</div>
+      <div slot="content">
         <div>
-          ${
-          map([...new Array(this._playerHearts[i].max)], (_, j) =>
-            html`<span class=${
-              classMap({
-                "heart": true,
-                "heart-lit": j < this._playerHearts[i].lit,
-              })
-            }>♥</span>`)
-        }
-          <fluent-button @click=${() =>
-          this._changeNumLitHearts(i, +1)}>+</fluent-button>
-          <fluent-button @click=${() =>
-          this._changeNumLitHearts(i, -1)}>-</fluent-button>
-          <fluent-button @click=${() =>
-          this._changeNumLitHearts(i, -Infinity)}>0</fluent-button>
+          <fluent-checkbox ?checked=${this._playerProfilesVisible} @change=${(
+          ev: Event,
+        ) =>
+          this._setPlayerProfilesVisible(
+            (ev.target as HTMLInputElement).checked,
+          )}>プロフィールを表示</fluent-checkbox>
         </div>
-        `)
-    }
+        <div>
+          <fluent-select value=${numMaxHearts} @change=${(ev: Event) =>
+          this._setNumMaxHearts(Number((ev.target as FluentSelect).value))}>
+            <fluent-option value="0">ハート非表示</fluent-option>
+            <fluent-option value="1">1本先取</fluent-option>
+            <fluent-option value="2">2本先取</fluent-option>
+            <fluent-option value="3">3本先取</fluent-option>
+            <fluent-option value="4">4本先取</fluent-option>
+            <fluent-option value="5">5本先取</fluent-option>
+          </fluent-select>
+        </div>
+        <hr>
+        <div class="grid">
+          <div style="display: contents">
+            ${map(this._playerNames, (e) => html`<div class="name">${e != "" ? e : "[空席]"}</div>`)}
+          </div>
+          <div style="display: contents">
+            ${
+            map(this._playerHearts, (e, i) =>
+            html`
+            <div class="hearts-controller">
+              <div>
+                ${map([...new Array(this._playerHearts[i].max)], (_, j) =>
+                  html`<span class=${
+                    classMap({
+                      "heart": true,
+                      "heart-lit": j < this._playerHearts[i].lit,
+                    })
+                  }>♥</span>`)
+                }
+              </div>
+              <div>
+                <fluent-button @click=${() =>
+                this._changeNumLitHearts(i, -Infinity)}>0</fluent-button>
+                <fluent-button @click=${() =>
+                this._changeNumLitHearts(i, -1)}>-</fluent-button>
+                <fluent-button @click=${() =>
+                this._changeNumLitHearts(i, +1)}>+</fluent-button>
+              </div>
+            </div>
+            `)}
+          </div>
+        </div>
       </div>
-      ${map(this._playerNames, (e) => html`${e}`)}
-      <fluent-checkbox ?checked=${this._playerProfilesVisible} @change=${(
-      ev: Event,
-    ) =>
-      this._setPlayerProfilesVisible(
-        (ev.target as HTMLInputElement).checked,
-      )}>プロフィールを表示</fluent-checkbox>
-    </div>
+    </wakutet-section>
     `;
   }
 }

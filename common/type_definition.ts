@@ -21,6 +21,7 @@ export type HeartsData = {
 
 export type ProfileData = {
   name: string;
+  englishName: string | null;
   entries: [string, string][];
 };
 

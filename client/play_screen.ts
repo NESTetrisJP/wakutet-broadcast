@@ -36,13 +36,14 @@ const playerProfilesVisibleReplicant = await client.getReplicant(
 );
 
 playerNamesReplicant.subscribe((value) => {
-  value ??= [null, null].map(() => ({ original: "", english: null })) as [
+  value ??= [null, null].map((_, i) => ({ original: "", english: null })) as [
     NameData,
     NameData,
   ];
   value.forEach((name, i) => {
     if (playerNames.length <= i) return;
-    playerNames[i].innerText = toFullwidthName(name.original);
+    const originalName = name.original != "" ? name.original : `Player${i + 1}`;
+    playerNames[i].innerText = toFullwidthName(originalName);
     if (name.english) {
       const english = document.createElement("span");
       english.className = "english";

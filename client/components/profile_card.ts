@@ -1,6 +1,7 @@
 import { ProfileData } from "../../common/type_definition.ts";
 import { commonColors } from "../common_values.js";
 import {
+classMap,
   css,
   customElement,
   html,
@@ -29,13 +30,24 @@ export class WakutetProfileCardElement extends LitElement {
     text-align: center;
   }
 
-  .name::after {
+  .english-name {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .name-border {
     content: "";
     width: 100%;
     height: 4px;
     margin-top: 4px;
     display: block;
     background: linear-gradient(90deg, transparent, ${commonColors.theme}, ${commonColors.theme}, transparent);
+  }
+
+  .name-border-hidden {
+    display: none;
   }
 
   dl {
@@ -68,10 +80,12 @@ export class WakutetProfileCardElement extends LitElement {
   }
 
   render() {
-    const profile = this.profile ?? { name: "", entries: [] };
+    const profile = this.profile ?? { name: "", englishName: null, entries: [] };
     return html`
     <div class="container">
       <div class="name">${profile.name}</div>
+      <div class="english-name">${profile.englishName}</div>
+      <div class=${classMap({ "name-border": true, "name-border-hidden": profile.name == "" })}></div>
       <dl>
       ${
       map(profile.entries, (e) =>

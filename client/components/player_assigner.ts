@@ -16,11 +16,36 @@ import {
   ProfileData,
 } from "../../common/type_definition.ts";
 import "./profile_card.ts";
+import "./section.ts";
 
 @customElement("wakutet-player-assigner")
 export class WakutetPlayerAssignerElement extends LitElement {
   static styles = css`
-  .container {
+  .player-list {
+    width: 400px;
+    height: 150px;
+    font-size: 14px;
+    overflow-y: scroll;
+    user-select: none;
+  }
+
+  .player-list-row:nth-child(2n) {
+    background-color: rgb(240, 240, 240);
+  }
+  
+  .player-list-row:hover {
+    background-color: lightgray;
+  }
+
+  .profile-card-settings {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .profile-card-chooser {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
   }
 
   .profile-card-preview div {
@@ -29,7 +54,7 @@ export class WakutetPlayerAssignerElement extends LitElement {
   }
 
   wakutet-profile-card {
-    zoom: 50%;
+    zoom: 33%;
   }
   `;
 
@@ -117,11 +142,12 @@ export class WakutetPlayerAssignerElement extends LitElement {
   private _constructProfileData(
     databaseEntry: PlayerDatabaseEntry | null,
   ): ProfileData {
-    if (databaseEntry == null) return { name: "", entries: [] };
+    if (databaseEntry == null) return { name: "", englishName: null, entries: [] };
     const hiddenEntries =
       this._playerProfileHiddenEntries[databaseEntry.name] ?? [];
     return {
       name: databaseEntry.name,
+      englishName: databaseEntry.englishName,
       entries: databaseEntry.profileEntries.filter((e) =>
         hiddenEntries.indexOf(e[0]) == -1
       ),
@@ -193,53 +219,59 @@ export class WakutetPlayerAssignerElement extends LitElement {
       : null;
 
     return html`
-    <div class="container">
-      <fluent-button @click=${() =>
-      this
-        ._fetchPlayerDatabase()} ?disabled=${this._fetchingPlayerDatabase}>プレイヤー情報更新</fluent-button>
-      ${
-      map(this._playerDatabase, (e) =>
-        html`
-      <div @click=${() => this._selectRow(e.id)}>
-        ${e.name}
-      </div>
-      `)
-    }
-      <div>
-        ${
-      (() => {
-        if (selectedDatabaseEntry == null) return null;
-        const profileEntryKeys = selectedDatabaseEntry.profileEntries.map((e) =>
-          e[0]
-        );
-        return map(profileEntryKeys, (e) =>
-          html`
-          <fluent-checkbox ?checked=${
-            this._getProfileEntryVisibility(selectedDatabaseEntry.name, e)
-          } @change=${(ev: Event) =>
-            this._setProfileEntryVisibility(
-              selectedDatabaseEntry.name,
-              e,
-              (ev.target as HTMLInputElement).checked,
-            )}>${e}</fluent-checkbox>
-          `);
-      })()
-    }
-      </div>
-      <div class="profile-card-preview">
-        <div>
-          <wakutet-profile-card .profile=${previewProfile}></wakutet-profile-card>
+    <wakutet-section>
+      <div slot="header">プレイヤー割り当て</div>
+      <div slot="content">
+        <fluent-button @click=${() =>
+        this
+          ._fetchPlayerDatabase()} ?disabled=${this._fetchingPlayerDatabase}>プレイヤー情報更新</fluent-button>
+        <div class="player-list">
+          <div class="player-list-row" @click=${() => this._selectRow(-1)}>[空席]</div>
+          ${map(this._playerDatabase.toSorted((a, b) => a.name.localeCompare(b.name, "ja")), (e) =>
+            html`
+          <div class="player-list-row" @click=${() => this._selectRow(e.id)}>
+            ${e.name}
+          </div>
+          `)}
         </div>
+        <div class="profile-card-settings">
+          <div class="profile-card-chooser">
+            ${
+          (() => {
+            if (selectedDatabaseEntry == null) return null;
+            const profileEntryKeys = selectedDatabaseEntry.profileEntries.map((e) =>
+              e[0]
+            );
+            return map(profileEntryKeys, (e) =>
+              html`
+              <fluent-checkbox ?checked=${
+                this._getProfileEntryVisibility(selectedDatabaseEntry.name, e)
+              } @change=${(ev: Event) =>
+                this._setProfileEntryVisibility(
+                  selectedDatabaseEntry.name,
+                  e,
+                  (ev.target as HTMLInputElement).checked,
+                )}>${e}</fluent-checkbox>
+              `);
+          })()
+        }
+          </div>
+          <div class="profile-card-preview">
+            <div>
+              <wakutet-profile-card .profile=${previewProfile}></wakutet-profile-card>
+            </div>
+          </div>
+        </div>
+        <fluent-button appearance="accent" @click=${(ev: Event) => {
+        this._assignPlayer(this._databaseSelectedId, 0);
+        ev.stopPropagation();
+      }}>1Pにセット</fluent-button>
+        <fluent-button appearance="accent" @click=${(ev: Event) => {
+        this._assignPlayer(this._databaseSelectedId, 1);
+        ev.stopPropagation();
+      }}>2Pにセット</fluent-button>
       </div>
-      <fluent-button @click=${(ev: Event) => {
-      this._assignPlayer(this._databaseSelectedId, 0);
-      ev.stopPropagation();
-    }}>1P</fluent-button>
-      <fluent-button @click=${(ev: Event) => {
-      this._assignPlayer(this._databaseSelectedId, 1);
-      ev.stopPropagation();
-    }}>2P</fluent-button>
-    </div>
+    </wakutet-section>
     `;
   }
 }
