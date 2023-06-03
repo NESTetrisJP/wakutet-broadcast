@@ -37,7 +37,7 @@ export class WakutetQualifierRankingElement extends LitElement {
 
 	.ranking {
 		position: absolute;
-		left: 160px;
+		left: 192px;
     top: 160px;
     /*width: 1664px;*/
     height: 768px;
@@ -48,11 +48,11 @@ export class WakutetQualifierRankingElement extends LitElement {
 
 	.row {
 		color: white;
-		width: 736px;
+		width: 704px;
 		height: 64px;
 		font-size: 32px;
 		display: grid;
-		grid-template-columns: 64px 320px 288px;
+		grid-template-columns: 64px 320px 256px;
 		grid-template-rows: 32px 16px;
     justify-content: space-between;
 	}

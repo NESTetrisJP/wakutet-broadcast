@@ -283,9 +283,7 @@
     "https://deno.land/x/esbuild@v0.17.5/mod.d.ts": "dc279a3a46f084484453e617c0cabcd5b8bd1920c0e562e4ea02dfc828c8f968",
     "https://deno.land/x/esbuild@v0.17.5/mod.js": "dc1fca58bbb66e7e87d2234d6518a718ef54019525c2523506cbb6aa619eaa98",
     "https://deno.land/x/esbuild@v0.17.6/mod.d.ts": "dc279a3a46f084484453e617c0cabcd5b8bd1920c0e562e4ea02dfc828c8f968",
-    "https://esm.sh/fast-deep-equal@3.1.3": "362e05b124d296443705a82ba9df27eacf834ed22fc2e4ea4117f64450f5ee23",
-    "https://esm.sh/v114/fast-deep-equal@3.1.3/deno/fast-deep-equal.mjs": "64f660f95839c8707928b30f235061c623f279ba4ad4b4e739c767e84478e446",
-    "https://esm.sh/v114/fast-deep-equal@3.1.3/index.d.ts": "162628ec1a6561ff46f2d01788dcad88a60f9584562a94247ed818a6b0372936",
+    "https://esm.sh/fast-deep-equal@3.1.3": "5cbe7c056cfe2b134879a848c34e2ce2b913fe71ceb225f45a5ab7a86cc5f58d",
     "https://esm.sh/v117/@types/promise-queue@2.2.0/index.d.ts": "9c83ff7032365b27f5c54463fff2df94eba47e37a0e262157bf99c01dd57032d",
     "https://esm.sh/v117/crypto-js@4.1.1/deno/core.js": "5220c9b8c6c14ba92b6077e0cd6080bcf6687542d17e7f5bcb84692b48750506",
     "https://esm.sh/v117/crypto-js@4.1.1/deno/enc-base64.js": "b5d7c7b26bdd3beacf1ee6a66edaafc1541d3a514f227c9f707c0fc24e4e5204",
@@ -380,6 +378,8 @@
     "https://esm.sh/v117/type-fest@2.19.0/source/typed-array.d.ts": "1b8357b3fef5be61b5de6d6a4805a534d68fe3e040c11f1944e27d4aec85936a",
     "https://esm.sh/v117/type-fest@2.19.0/source/union-to-intersection.d.ts": "eb1625bab70cfed00931a1e09ecb7834b61a666b0011913b0ec24a8e219023ef",
     "https://esm.sh/v117/type-fest@2.19.0/source/value-of.d.ts": "18b86125c67d99150f54225df07349ddd07acde086b55f3eeac1c34c81e424d8",
-    "https://esm.sh/v117/type-fest@2.19.0/source/writable.d.ts": "01c28c97052b611061766f90f4a9a7ddab0e8991662b89c1c1a59b4e8f73b574"
+    "https://esm.sh/v117/type-fest@2.19.0/source/writable.d.ts": "01c28c97052b611061766f90f4a9a7ddab0e8991662b89c1c1a59b4e8f73b574",
+    "https://esm.sh/v119/fast-deep-equal@3.1.3/deno/fast-deep-equal.mjs": "64f660f95839c8707928b30f235061c623f279ba4ad4b4e739c767e84478e446",
+    "https://esm.sh/v119/fast-deep-equal@3.1.3/index.d.ts": "83d9b971065396db735dc9857802004da2b6a095c9f0a4aa2c1dc8f4a730da25"
   }
 }
