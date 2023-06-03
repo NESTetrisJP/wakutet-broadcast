@@ -20,7 +20,8 @@ export class WakutetTitleElement extends LitElement {
   static styles = css`
   .container {
     width: 1920px;
-    height: 1000px;
+    height: 1080px;
+    background: gray;
   }
   `;
 

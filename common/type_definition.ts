@@ -37,6 +37,7 @@ export type TypeDefinition = {
   replicants: {
     currentSceneName: string;
     matchName: string;
+    commentaryNames: string[];
     playerNames: [NameData, NameData];
     playerHearts: [HeartsData, HeartsData];
     playerProfiles: [ProfileData, ProfileData];
@@ -48,7 +49,9 @@ export type TypeDefinition = {
     playerProfileHiddenEntries: Record<string, string[]>;
   };
 
-  messages: {};
+  messages: {
+    startTitleTimer: { params: { seconds: number } }
+  };
 
   requests: {
     fetchPlayerDatabase: EmptyObject;

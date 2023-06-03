@@ -1,9 +1,12 @@
+import { denocg } from "./deps/denocg.ts";
 import {
   css,
   customElement,
   html,
   LitElement,
+  live,
   provide,
+  query,
   state,
 } from "./deps/lit.ts";
 import "./deps/fluent.ts";
@@ -18,6 +21,7 @@ import { WakutetPlayerAssignerElement } from "./components/player_assigner.ts";
 import "./components/player_assigner.ts";
 import { WakutetSectionElement } from "./components/section.ts";
 import "./components/section.ts";
+import { FluentTextField } from "./deps/fluent.ts";
 
 @customElement("wakutet-dashboard")
 export class WakutetDashboardElement extends LitElement {
@@ -31,8 +35,35 @@ export class WakutetDashboardElement extends LitElement {
   @state()
   private _denocgContext: DenoCGContext = createDenoCGContext();
 
+  private _matchNameReplicant!: denocg.Replicant<string>
+  private _commentaryNamesReplicant!: denocg.Replicant<string[]>
+
+  @state()
+  private _matchName = "";
+  @state()
+  private _commentaryNames: string[] = [];
+
+  @query("#match-name")
+  private _matchNameText!: FluentTextField
+  @query("#commentary-1")
+  private _commentary1Text!: FluentTextField
+  @query("#commentary-2")
+  private _commentary2Text!: FluentTextField
+
   constructor() {
     super();
+  }
+
+  async firstUpdated() {
+    const client = await this._denocgContext.getClient();
+    this._matchNameReplicant = await client.getReplicant("matchName");
+    this._matchNameReplicant.subscribe(value => {
+      this._matchName = value ?? "";
+    });
+    this._commentaryNamesReplicant = await client.getReplicant("commentaryNames");
+    this._commentaryNamesReplicant.subscribe(value => {
+      this._commentaryNames = value ?? [];
+    });
   }
 
   private async _changeScene(sceneName: string) {
@@ -43,13 +74,23 @@ export class WakutetDashboardElement extends LitElement {
     currentSceneNameReplicant.setValue(sceneName);
   }
 
+  private _setFooter() {
+    this._matchNameReplicant.setValue(this._matchNameText.value);
+    this._matchName = this._matchNameText.value;
+    const commentaryNames: string[] = [];
+    const rawCommentaryNames = [this._commentary1Text.value, this._commentary2Text.value];
+    rawCommentaryNames.forEach(e => {
+      if (e != "") commentaryNames.push(e);
+    });
+    this._commentaryNamesReplicant.setValue(commentaryNames);
+    this._commentaryNames = commentaryNames;
+  }
+
   render() {
     return html`
     <div class="container">
       <wakutet-section>
-        <div slot="header">
-          シーン
-        </div>
+        <div slot="header">シーン</div>
         <div slot="content">
           <fluent-button @click=${() =>
           this._changeScene("title")}>タイトル</fluent-button>
@@ -61,6 +102,16 @@ export class WakutetDashboardElement extends LitElement {
           this._changeScene("qualifier_ranking")}>予選ランキング</fluent-button>
           <fluent-button @click=${() =>
           this._changeScene("bracket")}>トーナメント表</fluent-button>
+        </div>
+      </wakutet-section>
+      <wakutet-section>
+        <div slot="header">フッター</div>
+        <div slot="content">
+          <fluent-text-field id="match-name" value=${this._matchName}>試合名</fluent-text-field>
+          <fluent-text-field id="commentary-1" value=${live(this._commentaryNames[0] ?? "")}>実況1</fluent-text-field>
+          <fluent-text-field id="commentary-2" value=${live(this._commentaryNames[1] ?? "")}>実況2</fluent-text-field>
+          <br>
+          <fluent-button appearance="accent" @click=${() => this._setFooter()}>更新</fluent-button>
         </div>
       </wakutet-section>
       <wakutet-stage-controller></wakutet-stage-controller>
