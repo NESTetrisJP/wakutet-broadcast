@@ -36,6 +36,7 @@ export type QualifierRankingEntry = {
 export type TypeDefinition = {
   replicants: {
     currentSceneName: string;
+    titleScreenName: string;
     matchName: string;
     commentaryNames: string[];
     playerNames: [NameData, NameData];

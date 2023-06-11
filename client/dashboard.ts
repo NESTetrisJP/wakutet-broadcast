@@ -74,6 +74,12 @@ export class WakutetDashboardElement extends LitElement {
     currentSceneNameReplicant.setValue(sceneName);
   }
 
+  private async _setTitleScreenName(name: string) {
+    const client = await this._denocgContext.getClient();
+    const titleScreenNameReplicant = await client.getReplicant("titleScreenName");
+    titleScreenNameReplicant.setValue(name);
+  }
+
   private _setFooter() {
     this._matchNameReplicant.setValue(this._matchNameText.value);
     this._matchName = this._matchNameText.value;
@@ -102,6 +108,14 @@ export class WakutetDashboardElement extends LitElement {
           this._changeScene("qualifier_ranking")}>予選ランキング</fluent-button>
           <fluent-button @click=${() =>
           this._changeScene("bracket")}>トーナメント表</fluent-button>
+        </div>
+      </wakutet-section>
+      <wakutet-section>
+        <div slot="header">タイトル画面</div>
+        <div slot="content">
+          <fluent-button @click=${() => this._setTitleScreenName("generic")}>汎用</fluent-button>
+          <fluent-button @click=${() => this._setTitleScreenName("preparing")}>準備中</fluent-button>
+          <fluent-button @click=${() => this._setTitleScreenName("break")}>休憩中</fluent-button>
         </div>
       </wakutet-section>
       <wakutet-section>
