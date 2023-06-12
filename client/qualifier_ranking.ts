@@ -38,9 +38,9 @@ export class WakutetQualifierRankingElement extends LitElement {
 	.ranking {
 		position: absolute;
 		left: 192px;
-    top: 160px;
+    top: 240px;
     /*width: 1664px;*/
-    height: 768px;
+    height: 576px;
 		column-count: 2;
     column-gap: 128px;
 		column-fill: auto;
