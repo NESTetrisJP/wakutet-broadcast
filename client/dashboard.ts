@@ -21,7 +21,7 @@ import { WakutetPlayerAssignerElement } from "./components/player_assigner.ts";
 import "./components/player_assigner.ts";
 import { WakutetSectionElement } from "./components/section.ts";
 import "./components/section.ts";
-import { FluentTextField } from "./deps/fluent.ts";
+import { FluentNumberField, FluentTextField } from "./deps/fluent.ts";
 
 @customElement("wakutet-dashboard")
 export class WakutetDashboardElement extends LitElement {
@@ -42,6 +42,9 @@ export class WakutetDashboardElement extends LitElement {
   private _matchName = "";
   @state()
   private _commentaryNames: string[] = [];
+
+  @query("#countdown-seconds")
+  private _countdownSecondsNumber!: FluentNumberField
 
   @query("#match-name")
   private _matchNameText!: FluentTextField
@@ -80,6 +83,12 @@ export class WakutetDashboardElement extends LitElement {
     titleScreenNameReplicant.setValue(name);
   }
 
+  private async _startCountdown() {
+    const client = await this._denocgContext.getClient();
+    const seconds = this._countdownSecondsNumber.valueAsNumber;
+    client.broadcastMessage("startTitleTimer", { seconds });
+  }
+
   private _setFooter() {
     this._matchNameReplicant.setValue(this._matchNameText.value);
     this._matchName = this._matchNameText.value;
@@ -116,6 +125,8 @@ export class WakutetDashboardElement extends LitElement {
           <fluent-button @click=${() => this._setTitleScreenName("generic")}>汎用</fluent-button>
           <fluent-button @click=${() => this._setTitleScreenName("preparing")}>準備中</fluent-button>
           <fluent-button @click=${() => this._setTitleScreenName("break")}>休憩中</fluent-button>
+          <fluent-number-field id="countdown-seconds" style="margin-left: 16px; width: 150px; vertical-align: bottom;" min="0" value="600">カウントダウン秒数</fluent-number-field>
+          <fluent-button @click=${() => this._startCountdown()}>セット</fluent-button>
         </div>
       </wakutet-section>
       <wakutet-section>
