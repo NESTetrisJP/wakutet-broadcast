@@ -197,7 +197,7 @@ export class WakutetPlayerAssignerElement extends LitElement {
     if (isVisible) {
       const index = modifiedEntries.indexOf(entryName);
       if (index >= 0) {
-        modifiedEntries.splice(index);
+        modifiedEntries.splice(index, 1);
       }
     } else {
       if (modifiedEntries.indexOf(entryName) == -1) {
