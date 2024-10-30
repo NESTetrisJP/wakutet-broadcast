@@ -5,16 +5,10 @@ import {
   DenoCGContext,
   denocgContext,
 } from "./denocg_context.ts";
-import {
-classMap,
-  css,
-  customElement,
-  html,
-  LitElement,
-  map,
-  provide,
-  state,
-} from "./deps/lit.ts";
+import { css, html, LitElement } from "lit";
+import { customElement, state } from "lit/decorators.js";
+import { classMap } from "lit/directives/class-map.js";
+import { provide } from "@lit-labs/context";
 
 @customElement("wakutet-title")
 export class WakutetTitleElement extends LitElement {

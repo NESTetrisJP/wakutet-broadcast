@@ -1,5 +1,8 @@
 import { createDenoCGContext, denocgContext, DenoCGContext } from "./denocg_context.ts";
-import { css, customElement, html, LitElement, provide, state, styleMap } from "./deps/lit.ts";
+import { css, html, LitElement } from "lit";
+import { customElement, state } from "lit/decorators.js";
+import { styleMap } from "lit/directives/style-map.js";
+import { provide } from "@lit-labs/context";
 
 @customElement("wakutet-footer")
 export class WakutetFooterElement extends LitElement {

@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "deno.ns", "deno.unstable"]
+  },
+  "exclude": [
+    "./client/*.bundle.js",
+    "./replicants.json"
+  ],
+  "imports": {
+    "@fluentui/web-components": "npm:@fluentui/web-components@^2.6.1",
+    "@lit-labs/context": "npm:@lit-labs/context@^0.5.1",
+    "@luca/esbuild-deno-loader": "jsr:@luca/esbuild-deno-loader@^0.10.3",
+    "denocg/client": "https://deno.land/x/denocg@v0.0.8/client/mod.ts",
+    "denocg/server": "https://deno.land/x/denocg@v0.0.8/server/mod.ts",
+    "esbuild": "npm:esbuild@^0.21.3",
+    "lit": "npm:lit@^3.1.3",
+    "obs-websocket-js": "npm:obs-websocket-js@^5.0.5",
+    "promise-queue": "npm:promise-queue@2.2.5"
+  },
+  "tasks": {
+    "gen-common-types": "cd ../competition-sheet && node gen_common_types.js ../broadcast/common/common_types.ts",
+    "build": "deno run --allow-env --allow-net --allow-read --allow-run --allow-write build.ts build",
+    "build-watch": "deno run --allow-env --allow-net --allow-read --allow-run --allow-write build.ts watch",
+    "start": "deno run --allow-env --allow-net --allow-read --allow-write main.ts",
+    "start-watch": "deno run --watch --allow-env --allow-net --allow-read --allow-write main.ts",
+    "dev": "deno task build-watch & deno task start-watch"
+  }
+}

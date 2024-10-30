@@ -1,15 +1,9 @@
-import { denocg } from "./deps/denocg.ts";
-import {
-  css,
-  customElement,
-  html,
-  LitElement,
-  live,
-  provide,
-  query,
-  state,
-} from "./deps/lit.ts";
-import "./deps/fluent.ts";
+import * as denocg from "denocg/client";
+import { css, html, LitElement } from "lit";
+import { customElement, query, state } from "lit/decorators.js";
+import { live } from "lit/directives/live.js";
+import { provide } from "@lit-labs/context";
+import "./register_fluentui_elements.ts";
 import {
   createDenoCGContext,
   DenoCGContext,
@@ -21,7 +15,7 @@ import { WakutetPlayerAssignerElement } from "./components/player_assigner.ts";
 import "./components/player_assigner.ts";
 import { WakutetSectionElement } from "./components/section.ts";
 import "./components/section.ts";
-import { FluentNumberField, FluentTextField } from "./deps/fluent.ts";
+import { NumberField, TextField } from "@fluentui/web-components";
 
 @customElement("wakutet-dashboard")
 export class WakutetDashboardElement extends LitElement {
@@ -44,14 +38,14 @@ export class WakutetDashboardElement extends LitElement {
   private _commentaryNames: string[] = [];
 
   @query("#countdown-seconds")
-  private _countdownSecondsNumber!: FluentNumberField
+  private _countdownSecondsNumber!: NumberField
 
   @query("#match-name")
-  private _matchNameText!: FluentTextField
+  private _matchNameText!: TextField
   @query("#commentary-1")
-  private _commentary1Text!: FluentTextField
+  private _commentary1Text!: TextField
   @query("#commentary-2")
-  private _commentary2Text!: FluentTextField
+  private _commentary2Text!: TextField
 
   constructor() {
     super();

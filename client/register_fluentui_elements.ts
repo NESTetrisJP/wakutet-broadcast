@@ -15,7 +15,8 @@ import {
   fluentTabs,
   fluentTextField,
   provideFluentDesignSystem,
-} from "https://esm.sh/v117/@fluentui/web-components@2.5.13";
+} from "@fluentui/web-components";
+
 provideFluentDesignSystem().register(
   fluentButton(),
   fluentCard(),
@@ -33,19 +34,3 @@ provideFluentDesignSystem().register(
   fluentTabs(),
   fluentTextField(),
 );
-export {
-  Button as FluentButton,
-  Card as FluentCard,
-  // Checkbox as FluentCheckbox, // TODO
-  Dialog as FluentDialog,
-  NumberField as FluentNumberField,
-  ProgressRing as FluentProgressRing,
-  // Option as FluentOption, // TODO
-  Radio as FluentRadio,
-  RadioGroup as FluentRadioGroup,
-  Select as FluentSelect,
-  Tab as FluentTab,
-  TabPanel as FluentTabPanel,
-  Tabs as FluentTabs,
-  TextField as FluentTextField,
-} from "https://esm.sh/v117/@fluentui/web-components@2.5.13";

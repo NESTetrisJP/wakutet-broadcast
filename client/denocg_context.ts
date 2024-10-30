@@ -1,6 +1,6 @@
 import { TypeDefinition } from "../common/type_definition.ts";
-import { denocg } from "./deps/denocg.ts";
-import { createContext } from "./deps/lit.ts";
+import * as denocg from "denocg/client";
+import { createContext } from "@lit-labs/context";
 
 export class DenoCGContext {
   #clientPromise: Promise<denocg.Client<TypeDefinition>>;

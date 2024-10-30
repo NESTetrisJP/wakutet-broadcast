@@ -3,14 +3,9 @@ import {
   DenoCGContext,
   denocgContext,
 } from "./denocg_context.ts";
-import {
-  css,
-  customElement,
-  html,
-  LitElement,
-  provide,
-  state,
-} from "./deps/lit.ts";
+import { css, html, LitElement } from "lit";
+import { customElement, state } from "lit/decorators.js";
+import { provide } from "@lit-labs/context";
 
 @customElement("wakutet-bracket")
 export class WakutetBracketElement extends LitElement {

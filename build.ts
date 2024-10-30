@@ -1,5 +1,5 @@
-import * as esbuild from "https://deno.land/x/esbuild@v0.17.5/mod.js";
-import { httpImports } from "./esbuild-plugin/esbuild-plugin-http-imports.ts";
+import * as esbuild from "esbuild";
+import { denoPlugins } from "@luca/esbuild-deno-loader";
 
 const mode = Deno.args[0];
 if (mode != "build" && mode != "watch") throw new Error("Invalid command");
@@ -22,23 +22,13 @@ const options: esbuild.BuildOptions = {
   outdir: "./client",
   outExtension: { ".js": ".bundle.js" },
   metafile: true,
-  loader: { ".mjs": "js" },
-  plugins: [
-    httpImports(),
-    {
-      name: "append-comments",
-      setup: (build) => {
-        build.onEnd((result) => {
-          Object.keys(result.metafile?.outputs ?? {}).forEach((path) => {
-            const input = Deno.readTextFileSync(path);
-            const output =
-              "// deno-lint-ignore-file\n// deno-fmt-ignore-file\n" + input;
-            Deno.writeTextFileSync(path, output);
-          });
-        });
-      },
+  plugins: [...denoPlugins({ configPath: `${import.meta.dirname}/deno.json` })],
+  tsconfigRaw: {
+    compilerOptions: {
+      experimentalDecorators: true,
+      useDefineForClassFields: false,
     },
-  ],
+  },
 };
 
 if (watch) {

@@ -3,7 +3,7 @@ import {
   NameData,
   TypeDefinition,
 } from "../common/type_definition.ts";
-import { denocg } from "./deps/denocg.ts";
+import * as denocg from "denocg/client";
 import { WakutetProfileCardElement } from "./components/profile_card.ts";
 import "./components/profile_card.ts";
 import { toFullwidthName } from "./common.ts";

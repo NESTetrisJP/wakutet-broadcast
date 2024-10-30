@@ -1,9 +1,5 @@
-import {
-  css,
-  customElement,
-  html,
-  LitElement,
-} from "../deps/lit.ts";
+import { css, html, LitElement } from "lit";
+import { customElement } from "lit/decorators.js";
 
 @customElement("wakutet-section")
 export class WakutetSectionElement extends LitElement {

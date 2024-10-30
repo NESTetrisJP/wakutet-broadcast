@@ -1,14 +1,9 @@
 import { ProfileData } from "../../common/type_definition.ts";
 import { commonColors } from "../common_values.js";
-import {
-classMap,
-  css,
-  customElement,
-  html,
-  LitElement,
-  map,
-  property,
-} from "../deps/lit.ts";
+import { css, html, LitElement } from "lit";
+import { customElement, property } from "lit/decorators.js";
+import { classMap } from "lit/directives/class-map.js";
+import { map } from "lit/directives/map.js";
 
 @customElement("wakutet-profile-card")
 export class WakutetProfileCardElement extends LitElement {

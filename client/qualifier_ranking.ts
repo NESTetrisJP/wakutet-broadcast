@@ -5,15 +5,10 @@ import {
   DenoCGContext,
   denocgContext,
 } from "./denocg_context.ts";
-import {
-  css,
-  customElement,
-  html,
-  LitElement,
-  map,
-  provide,
-  state,
-} from "./deps/lit.ts";
+import { css, html, LitElement } from "lit";
+import { customElement, state } from "lit/decorators.js";
+import { map } from "lit/directives/map.js";
+import { provide } from "@lit-labs/context";
 
 @customElement("wakutet-qualifier-ranking")
 export class WakutetQualifierRankingElement extends LitElement {

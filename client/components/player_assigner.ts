@@ -1,15 +1,10 @@
-import { denocg } from "../deps/denocg.ts";
+import * as denocg from "denocg/client";
 import { DenoCGContext, denocgContext } from "../denocg_context.ts";
-import {
-  consume,
-  css,
-  customElement,
-  html,
-  LitElement,
-  map,
-  state,
-} from "../deps/lit.ts";
-import "../deps/fluent.ts";
+import { css, html, LitElement } from "lit";
+import { customElement, state } from "lit/decorators.js";
+import { map } from "lit/directives/map.js";
+import { consume } from "@lit-labs/context";
+import "../register_fluentui_elements.ts";
 import {
   NameData,
   PlayerDatabaseEntry,

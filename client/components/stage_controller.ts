@@ -1,19 +1,14 @@
-import { denocg } from "../deps/denocg.ts";
+import * as denocg from "denocg/client";
 import { DenoCGContext, denocgContext } from "../denocg_context.ts";
-import {
-  classMap,
-  consume,
-  css,
-  customElement,
-  html,
-  LitElement,
-  map,
-  state,
-} from "../deps/lit.ts";
-import "../deps/fluent.ts";
+import { css, html, LitElement } from "lit";
+import { customElement, state } from "lit/decorators.js";
+import { classMap } from "lit/directives/class-map.js";
+import { map } from "lit/directives/map.js";
+import { consume } from "@lit-labs/context";
+import "../register_fluentui_elements.ts";
 import { HeartsData, NameData } from "../../common/type_definition.ts";
 import "./profile_card.ts";
-import { FluentSelect } from "../deps/fluent.ts";
+import { Select } from "@fluentui/web-components";
 import "./section.ts";
 
 @customElement("wakutet-stage-controller")
@@ -141,7 +136,7 @@ export class WakutetStageControllerElement extends LitElement {
         </div>
         <div>
           <fluent-select value=${numMaxHearts} @change=${(ev: Event) =>
-          this._setNumMaxHearts(Number((ev.target as FluentSelect).value))}>
+          this._setNumMaxHearts(Number((ev.target as Select).value))}>
             <fluent-option value="0">ハート非表示</fluent-option>
             <fluent-option value="1">1本先取</fluent-option>
             <fluent-option value="2">2本先取</fluent-option>

@@ -3,7 +3,8 @@ import {
   QualifierRankingEntry,
   TypeDefinition,
 } from "./common/type_definition.ts";
-import { denocg, Queue } from "./server/deps.ts";
+import * as denocg from "denocg/server";
+import Queue from "promise-queue";
 import { OBSController } from "./server/obs_controller.ts";
 import { serve } from "https://deno.land/std@0.175.0/http/server.ts";
 import { serveDir } from "https://deno.land/std@0.175.0/http/file_server.ts";
