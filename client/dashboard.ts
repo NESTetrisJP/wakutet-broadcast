@@ -19,7 +19,7 @@ import { NumberField, TextField } from "@fluentui/web-components";
 
 @customElement("wakutet-dashboard")
 export class WakutetDashboardElement extends LitElement {
-  static styles = css`
+  static override styles = css`
   .container {
   }
   `;
@@ -51,7 +51,7 @@ export class WakutetDashboardElement extends LitElement {
     super();
   }
 
-  async firstUpdated() {
+  override async firstUpdated() {
     const client = await this._denocgContext.getClient();
     this._matchNameReplicant = await client.getReplicant("matchName");
     this._matchNameReplicant.subscribe(value => {
@@ -95,7 +95,7 @@ export class WakutetDashboardElement extends LitElement {
     this._commentaryNames = commentaryNames;
   }
 
-  render() {
+  override render() {
     return html`
     <div class="container">
       <wakutet-section>

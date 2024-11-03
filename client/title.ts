@@ -12,7 +12,7 @@ import { provide } from "@lit-labs/context";
 
 @customElement("wakutet-title")
 export class WakutetTitleElement extends LitElement {
-  static styles = css`
+  static override styles = css`
   .container {
     width: 1920px;
     height: 1080px;
@@ -95,7 +95,7 @@ export class WakutetTitleElement extends LitElement {
     super();
   }
 
-  async firstUpdated() {
+  override async firstUpdated() {
     const client = await this._denocgContext.getClient();
 
     const titleScreenNameReplicant = await client.getReplicant("titleScreenName");
@@ -120,7 +120,7 @@ export class WakutetTitleElement extends LitElement {
     });
   }
 
-  render() {
+  override render() {
     const shouldShowTimer = this._currentTimerValue > 0 && this._screenName != "generic";
     const timerMinute = Math.floor(this._currentTimerValue / 60);
     const timerSecond = this._currentTimerValue % 60;

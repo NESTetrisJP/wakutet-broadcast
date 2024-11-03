@@ -12,7 +12,7 @@ import { provide } from "@lit-labs/context";
 
 @customElement("wakutet-qualifier-ranking")
 export class WakutetQualifierRankingElement extends LitElement {
-  static styles = css`
+  static override styles = css`
   .container {
     width: 1920px;
     height: 1000px;
@@ -91,7 +91,7 @@ export class WakutetQualifierRankingElement extends LitElement {
     super();
   }
 
-  async firstUpdated() {
+  override async firstUpdated() {
     const client = await this._denocgContext.getClient();
     const qualifierRankingReplicant = await client.getReplicant(
       "qualifierRanking",
@@ -101,7 +101,7 @@ export class WakutetQualifierRankingElement extends LitElement {
     });
   }
 
-  render() {
+  override render() {
     return html`
     <div class="container">
 			<div class="header">予選ランキング</div>

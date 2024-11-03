@@ -7,7 +7,7 @@ import { map } from "lit/directives/map.js";
 
 @customElement("wakutet-profile-card")
 export class WakutetProfileCardElement extends LitElement {
-  static styles = css`
+  static override styles = css`
   .container {
     width: 356px;
     height: 716px;
@@ -74,7 +74,7 @@ export class WakutetProfileCardElement extends LitElement {
     super();
   }
 
-  render() {
+  override render() {
     const profile = this.profile ?? { name: "", englishName: null, entries: [] };
     return html`
     <div class="container">

@@ -6,7 +6,7 @@ import { provide } from "@lit-labs/context";
 
 @customElement("wakutet-footer")
 export class WakutetFooterElement extends LitElement {
-  static styles = css`
+  static override styles = css`
   .container {
     position: relative;
     width: 1920px;
@@ -61,7 +61,7 @@ export class WakutetFooterElement extends LitElement {
     super();
   }
 
-  async firstUpdated() {
+  override async firstUpdated() {
     const client = await this._denocgContext.getClient();
     const matchNameReplicant = await client.getReplicant("matchName");
     matchNameReplicant.subscribe((value) => {
@@ -73,7 +73,7 @@ export class WakutetFooterElement extends LitElement {
     });
   }
 
-  render() {
+  override render() {
     return html`
     <div class="container">
       <div class="content">

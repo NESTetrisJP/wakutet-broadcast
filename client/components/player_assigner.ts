@@ -15,7 +15,7 @@ import "./section.ts";
 
 @customElement("wakutet-player-assigner")
 export class WakutetPlayerAssignerElement extends LitElement {
-  static styles = css`
+  static override styles = css`
   .player-list {
     width: 400px;
     height: 150px;
@@ -87,7 +87,7 @@ export class WakutetPlayerAssignerElement extends LitElement {
     (_) => ({ name: "", entries: [] as [string, string][] }),
   ) as [ProfileData, ProfileData];
 
-  async firstUpdated() {
+  override async firstUpdated() {
     const client = await this._denocgContext.getClient();
     const playerDatabaseReplicant = await client.getReplicant("playerDatabase");
     playerDatabaseReplicant.subscribe((value) => {
@@ -205,7 +205,7 @@ export class WakutetPlayerAssignerElement extends LitElement {
     });
   }
 
-  render() {
+  override render() {
     const selectedDatabaseEntry = this._playerDatabase.find((e) =>
       e.id == this._databaseSelectedId
     );

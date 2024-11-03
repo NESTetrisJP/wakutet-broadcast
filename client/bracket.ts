@@ -9,7 +9,7 @@ import { provide } from "@lit-labs/context";
 
 @customElement("wakutet-bracket")
 export class WakutetBracketElement extends LitElement {
-  static styles = css`
+  static override styles = css`
   .container {
     width: 1920px;
     height: 1000px;
@@ -37,7 +37,7 @@ export class WakutetBracketElement extends LitElement {
     super();
   }
 
-  render() {
+  override render() {
     return html`
     <div class="container">
 			<div class="header">トーナメント</div>

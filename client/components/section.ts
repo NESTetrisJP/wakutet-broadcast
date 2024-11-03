@@ -3,7 +3,7 @@ import { customElement } from "lit/decorators.js";
 
 @customElement("wakutet-section")
 export class WakutetSectionElement extends LitElement {
-  static styles = css`
+  static override styles = css`
 	:host {
 		--color: #3e82d4;
 	}
@@ -31,7 +31,7 @@ export class WakutetSectionElement extends LitElement {
     super();
   }
 
-  render() {
+  override render() {
     return html`
     <div class="container">
 			<div class="header">

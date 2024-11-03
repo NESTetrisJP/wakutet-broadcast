@@ -13,7 +13,7 @@ import "./section.ts";
 
 @customElement("wakutet-stage-controller")
 export class WakutetStageControllerElement extends LitElement {
-  static styles = css`
+  static override styles = css`
   .grid {
     display: grid;
     grid-template-columns: 200px 200px;
@@ -75,7 +75,7 @@ export class WakutetStageControllerElement extends LitElement {
   private _playerHeartsReplicant!: denocg.Replicant<HeartsData[]>;
   private _playerProfilesVisibleReplicant!: denocg.Replicant<boolean>;
 
-  async firstUpdated() {
+  override async firstUpdated() {
     const client = await this._denocgContext.getClient();
     this._playerNamesReplicant = await client.getReplicant("playerNames");
     this._playerHeartsReplicant = await client.getReplicant("playerHearts");
@@ -117,7 +117,7 @@ export class WakutetStageControllerElement extends LitElement {
     this._playerProfilesVisibleReplicant.setValue(visible);
   }
 
-  render() {
+  override render() {
     const numMaxHearts = Math.min(
       Math.max(this._playerHearts[0]?.max ?? 0, 0),
       5,
