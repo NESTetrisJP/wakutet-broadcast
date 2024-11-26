@@ -2,11 +2,15 @@ import {
   HeartsData,
   NameData,
   TypeDefinition,
+  type ProfileData,
 } from "../common/type_definition.ts";
 import * as denocg from "denocg/client";
 import { WakutetProfileCardElement } from "./components/profile_card.ts";
 import "./components/profile_card.ts";
 import { toFullwidthName } from "./common.ts";
+import { MatchDataController } from "../common/match_data_controller.ts";
+
+const numMatches = 2;
 
 const client = await denocg.getClient<TypeDefinition>({
   socketHostname: "localhost",
@@ -16,66 +20,71 @@ const client = await denocg.getClient<TypeDefinition>({
 const playerNames = document.querySelectorAll<HTMLDivElement>(
   ".player .names .name",
 );
-const playerNamesReplicant = await client.getReplicant("playerNames");
-
 const playerHearts = document.querySelectorAll<HTMLDivElement>(
   ".player .names .hearts",
 );
-const playerHeartsReplicant = await client.getReplicant("playerHearts");
-
 const playerProfiles = document.querySelectorAll<WakutetProfileCardElement>(
   ".player .profile wakutet-profile-card",
 );
-const playerProfilesReplicant = await client.getReplicant("playerProfiles");
-
 const playerProfileContainers = document.querySelectorAll<HTMLDivElement>(
   ".player .profile",
 );
-const playerProfilesVisibleReplicant = await client.getReplicant(
-  "playerProfilesVisible",
-);
 
-playerNamesReplicant.subscribe((value) => {
-  value ??= [null, null].map((_, i) => ({ original: "", english: null })) as [
-    NameData,
-    NameData,
-  ];
-  value.forEach((name, i) => {
-    if (playerNames.length <= i) return;
-    const originalName = name.original != "" ? name.original : `Player${i + 1}`;
-    playerNames[i].innerText = toFullwidthName(originalName);
-    if (name.english) {
-      const english = document.createElement("span");
-      english.className = "english";
-      english.innerText = `(${name.english})`;
-      playerNames[i].appendChild(english);
-    }
-  });
-});
+const getCombinedIndex = (matchIndex: number, playerIndex: number) => {
+  return matchIndex * 2 + playerIndex;
+};
 
-playerHeartsReplicant.subscribe((value) => {
-  value ??= [null, null].map(() => ({ max: 0, lit: 0 })) as [
-    HeartsData,
-    HeartsData,
-  ];
-  value.forEach((e, i) => {
-    if (playerHearts.length <= i) return;
-    playerHearts[i].innerHTML = [...new Array(e.max)].map((_, i) =>
-      `<div class="${i < e.lit ? "lit" : "unlit"}">Œ</div>`
-    ).join("");
-  });
-});
+const getPlayerNameElement = (matchIndex: number, playerIndex: number) => {
+  return playerNames[getCombinedIndex(matchIndex, playerIndex)];
+};
+const getPlayerHeartsElement = (matchIndex: number, playerIndex: number) => {
+  return playerHearts[getCombinedIndex(matchIndex, playerIndex)];
+};
+const getPlayerProfileElement = (matchIndex: number, playerIndex: number) => {
+  return playerProfiles[getCombinedIndex(matchIndex, playerIndex)];
+};
+const getPlayerProfileContainerElement = (matchIndex: number, playerIndex: number) => {
+  return playerProfileContainers[getCombinedIndex(matchIndex, playerIndex)];
+};
 
-playerProfilesReplicant.subscribe((value) => {
-  const nullableValue = value ?? [undefined, undefined];
-  nullableValue.forEach((e, i) => {
-    if (playerProfiles.length <= i) return;
-    playerProfiles[i].profile = e;
-  });
-});
+const setPlayerName = (matchIndex: number, playerIndex: number, name: NameData) => {
+  const element = getPlayerNameElement(matchIndex, playerIndex);
+  const originalName = name.original != "" ? name.original : `Player${playerIndex + 1}`;
+  element.innerText = toFullwidthName(originalName);
+  if (name.english) {
+    const english = document.createElement("span");
+    english.className = "english";
+    english.innerText = `(${name.english})`;
+    element.appendChild(english);
+  }
+  getPlayerProfileElement(matchIndex, playerIndex).name = name;
+};
 
-playerProfilesVisibleReplicant.subscribe((value) => {
-  playerProfileContainers.forEach((container) => {
-    container.classList.toggle("profile-hidden", !value);
+const setPlayerHearts = (matchIndex: number, playerIndex: number, hearts: HeartsData) => {
+  const element = getPlayerHeartsElement(matchIndex, playerIndex);
+  element.innerHTML = [...new Array(hearts.max)].map((_, i) =>
+    `<div class="${i < hearts.lit ? "lit" : "unlit"}">Œ</div>`
+  ).join("");
+};
+
+const setPlayerProfile = (matchIndex: number, playerIndex: number, profile: ProfileData) => {
+  getPlayerProfileElement(matchIndex, playerIndex).profile = profile;
+}
+
+const setPlayerProfileVisible = (matchIndex: number, visible: boolean) => {
+  [0, 1].forEach(playerIndex => {
+    getPlayerProfileContainerElement(matchIndex, playerIndex).hidden = !visible;
   });
-});
+}
+
+const _matchDataController = new MatchDataController(
+  numMatches,
+  async () => await client.getReplicant("matchData"),
+  value => {
+    value.forEach((match, matchIndex) => {
+      match.playerNames.forEach((playerName, playerIndex) => setPlayerName(matchIndex, playerIndex, playerName));
+      match.playerHearts.forEach((hearts, playerIndex) => setPlayerHearts(matchIndex, playerIndex, hearts));
+      match.playerProfiles.forEach((profile, playerIndex) => setPlayerProfile(matchIndex, playerIndex, profile));
+      setPlayerProfileVisible(matchIndex, match.playerProfilesVisible);
+    });
+  });

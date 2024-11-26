@@ -2,6 +2,7 @@ import * as denocg from "denocg/client";
 import { css, html, LitElement } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
 import { live } from "lit/directives/live.js";
+import { map } from "lit/directives/map.js";
 import { provide } from "@lit-labs/context";
 import "./register_fluentui_elements.ts";
 import {
@@ -16,6 +17,8 @@ import "./components/player_assigner.ts";
 import { WakutetSectionElement } from "./components/section.ts";
 import "./components/section.ts";
 import { NumberField, TextField } from "@fluentui/web-components";
+
+const numMatches = 2;
 
 @customElement("wakutet-dashboard")
 export class WakutetDashboardElement extends LitElement {
@@ -96,21 +99,17 @@ export class WakutetDashboardElement extends LitElement {
   }
 
   override render() {
+    // deno-fmt-ignore
     return html`
     <div class="container">
       <wakutet-section>
         <div slot="header">シーン</div>
         <div slot="content">
-          <fluent-button @click=${() =>
-          this._changeScene("title")}>タイトル</fluent-button>
-          <fluent-button @click=${() =>
-          this._changeScene("commentary")}>実況席</fluent-button>
-          <fluent-button @click=${() =>
-          this._changeScene("play_screen")}>ゲーム画面</fluent-button>
-          <fluent-button @click=${() =>
-          this._changeScene("qualifier_ranking")}>予選ランキング</fluent-button>
-          <fluent-button @click=${() =>
-          this._changeScene("bracket")}>トーナメント表</fluent-button>
+          <fluent-button @click=${() => this._changeScene("title")}>タイトル</fluent-button>
+          <fluent-button @click=${() => this._changeScene("commentary")}>実況席</fluent-button>
+          <fluent-button @click=${() => this._changeScene("play_screen")}>ゲーム画面</fluent-button>
+          <fluent-button @click=${() => this._changeScene("qualifier_ranking")}>予選ランキング</fluent-button>
+          <fluent-button @click=${() => this._changeScene("bracket")}>トーナメント表</fluent-button>
         </div>
       </wakutet-section>
       <wakutet-section>
@@ -133,8 +132,10 @@ export class WakutetDashboardElement extends LitElement {
           <fluent-button appearance="accent" @click=${() => this._setFooter()}>更新</fluent-button>
         </div>
       </wakutet-section>
-      <wakutet-stage-controller></wakutet-stage-controller>
-      <wakutet-player-assigner></wakutet-player-assigner>
+      ${map([...new Array(numMatches)].map((_, i) => i), matchIndex => {
+        return html`<wakutet-stage-controller num-matches=${numMatches} match-index=${matchIndex}></wakutet-stage-controller>`;
+      })}
+      <wakutet-player-assigner num-matches=${numMatches}></wakutet-player-assigner>
     </div>
     `;
   }

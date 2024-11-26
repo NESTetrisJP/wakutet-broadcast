@@ -1,7 +1,7 @@
 import * as denocg from "denocg/client";
 import { DenoCGContext, denocgContext } from "../denocg_context.ts";
 import { css, html, LitElement } from "lit";
-import { customElement, state } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import { map } from "lit/directives/map.js";
 import { consume } from "@lit-labs/context";
 import "../register_fluentui_elements.ts";
@@ -12,6 +12,7 @@ import {
 } from "../../common/type_definition.ts";
 import "./profile_card.ts";
 import "./section.ts";
+import { MatchDataController } from "../../common/match_data_controller.ts";
 
 @customElement("wakutet-player-assigner")
 export class WakutetPlayerAssignerElement extends LitElement {
@@ -57,6 +58,9 @@ export class WakutetPlayerAssignerElement extends LitElement {
     super();
   }
 
+  @property({ attribute: "num-matches", type: Number })
+  numMatches: number = 1; 
+
   // @ts-ignore: ?
   @consume({ context: denocgContext })
   private _denocgContext!: DenoCGContext;
@@ -71,21 +75,10 @@ export class WakutetPlayerAssignerElement extends LitElement {
   @state()
   private _playerProfileHiddenEntries: Record<string, string[]> = {};
 
-  private _playerNamesReplicant!: denocg.Replicant<[NameData, NameData]>;
-  private _playerProfilesReplicant!: denocg.Replicant<
-    [ProfileData, ProfileData]
-  >;
+  private _matchDataController!: MatchDataController;
   private _playerProfileHiddenEntriesReplicant!: denocg.Replicant<
     Record<string, string[]>
   >;
-
-  private _playerNames: [NameData, NameData] = [null, null].map((_) => ({
-    original: "",
-    english: "",
-  })) as [NameData, NameData];
-  private _playerProfiles: [ProfileData, ProfileData] = [null, null].map(
-    (_) => ({ name: "", entries: [] as [string, string][] }),
-  ) as [ProfileData, ProfileData];
 
   override async firstUpdated() {
     const client = await this._denocgContext.getClient();
@@ -93,25 +86,13 @@ export class WakutetPlayerAssignerElement extends LitElement {
     playerDatabaseReplicant.subscribe((value) => {
       this._playerDatabase = value ?? [];
     });
-    this._playerNamesReplicant = await client.getReplicant("playerNames");
-    this._playerProfilesReplicant = await client.getReplicant("playerProfiles");
+    this._matchDataController = new MatchDataController(
+      this.numMatches,
+      async () => await client.getReplicant("matchData"),
+      _ => {});
     this._playerProfileHiddenEntriesReplicant = await client.getReplicant(
       "playerProfileHiddenEntries",
     );
-    this._playerNamesReplicant.subscribe((value) => {
-      this._playerNames = value ??
-        [null, null].map((_) => ({ original: "", english: "" })) as [
-          NameData,
-          NameData,
-        ];
-    });
-    this._playerProfilesReplicant.subscribe((value) => {
-      this._playerProfiles = value ??
-        [null, null].map((_) => ({
-          name: "",
-          entries: [] as [string, string][],
-        })) as [ProfileData, ProfileData];
-    });
     this._playerProfileHiddenEntriesReplicant.subscribe((value) => {
       this._playerProfileHiddenEntries = value ?? {};
     });
@@ -137,12 +118,10 @@ export class WakutetPlayerAssignerElement extends LitElement {
   private _constructProfileData(
     databaseEntry: PlayerDatabaseEntry | null,
   ): ProfileData {
-    if (databaseEntry == null) return { name: "", englishName: null, entries: [] };
+    if (databaseEntry == null) return { entries: [] };
     const hiddenEntries =
       this._playerProfileHiddenEntries[databaseEntry.name] ?? [];
     return {
-      name: databaseEntry.name,
-      englishName: databaseEntry.englishName,
       entries: databaseEntry.profileEntries.filter((e) =>
         hiddenEntries.indexOf(e[0]) == -1
       ),
@@ -156,20 +135,15 @@ export class WakutetPlayerAssignerElement extends LitElement {
     this._databaseSelectedId = id;
   }
 
-  private _assignPlayer(id: number, playerIndex: number) {
-    const playerNames = [...this._playerNames] as [NameData, NameData];
-    const playerProfiles = [...this._playerProfiles] as [
-      ProfileData,
-      ProfileData,
-    ];
-    playerNames[playerIndex] = this._constructNameData(
+  private _assignPlayer(id: number, matchIndex: number, playerIndex: number) {
+    const nameData = this._constructNameData(
       this._playerDatabase.find((e) => e.id == id) ?? null,
     );
-    playerProfiles[playerIndex] = this._constructProfileData(
+    const profileData = this._constructProfileData(
       this._playerDatabase.find((e) => e.id == id) ?? null,
     );
-    this._playerNamesReplicant.setValue(playerNames);
-    this._playerProfilesReplicant.setValue(playerProfiles);
+    this._matchDataController.setPlayerName(matchIndex, playerIndex, nameData);
+    this._matchDataController.setPlayerProfile(matchIndex, playerIndex, profileData);
   }
 
   private _getProfileEntryVisibility(
@@ -213,43 +187,29 @@ export class WakutetPlayerAssignerElement extends LitElement {
       ? this._constructProfileData(selectedDatabaseEntry)
       : null;
 
+    // deno-fmt-ignore
     return html`
     <wakutet-section>
       <div slot="header">プレイヤー割り当て</div>
       <div slot="content">
-        <fluent-button @click=${() =>
-        this
-          ._fetchPlayerDatabase()} ?disabled=${this._fetchingPlayerDatabase}>プレイヤー情報更新</fluent-button>
+        <fluent-button @click=${() => this._fetchPlayerDatabase()} ?disabled=${this._fetchingPlayerDatabase}>プレイヤー情報更新</fluent-button>
         <div class="player-list">
           <div class="player-list-row" @click=${() => this._selectRow(-1)}>[空席]</div>
           ${map(this._playerDatabase.toSorted((a, b) => a.name.localeCompare(b.name, "ja")), (e) =>
-            html`
-          <div class="player-list-row" @click=${() => this._selectRow(e.id)}>
-            ${e.name}
-          </div>
-          `)}
+            html`<div class="player-list-row" @click=${() => this._selectRow(e.id)}>${e.name}</div>`)}
         </div>
         <div class="profile-card-settings">
           <div class="profile-card-chooser">
-            ${
-          (() => {
-            if (selectedDatabaseEntry == null) return null;
-            const profileEntryKeys = selectedDatabaseEntry.profileEntries.map((e) =>
-              e[0]
-            );
-            return map(profileEntryKeys, (e) =>
-              html`
-              <fluent-checkbox ?checked=${
-                this._getProfileEntryVisibility(selectedDatabaseEntry.name, e)
-              } @change=${(ev: Event) =>
-                this._setProfileEntryVisibility(
-                  selectedDatabaseEntry.name,
-                  e,
-                  (ev.target as HTMLInputElement).checked,
-                )}>${e}</fluent-checkbox>
-              `);
-          })()
-        }
+            ${(() => {
+              if (selectedDatabaseEntry == null) return null;
+              const profileEntryKeys = selectedDatabaseEntry.profileEntries.map((e) => e[0]);
+              return map(profileEntryKeys, (e) => html`
+                <fluent-checkbox
+                  ?checked=${this._getProfileEntryVisibility(selectedDatabaseEntry.name, e)}
+                  @change=${(ev: Event) => this._setProfileEntryVisibility(selectedDatabaseEntry.name, e, (ev.target as HTMLInputElement).checked)}
+                >${e}</fluent-checkbox>
+                `);
+            })()}
           </div>
           <div class="profile-card-preview">
             <div>
@@ -257,14 +217,17 @@ export class WakutetPlayerAssignerElement extends LitElement {
             </div>
           </div>
         </div>
-        <fluent-button appearance="accent" @click=${(ev: Event) => {
-        this._assignPlayer(this._databaseSelectedId, 0);
-        ev.stopPropagation();
-      }}>1Pにセット</fluent-button>
-        <fluent-button appearance="accent" @click=${(ev: Event) => {
-        this._assignPlayer(this._databaseSelectedId, 1);
-        ev.stopPropagation();
-      }}>2Pにセット</fluent-button>
+        ${map([...new Array(this.numMatches)].map((_, i) => i), matchIndex => {
+          const matchNumber = matchIndex + 1;
+          return html`
+          <fluent-button appearance="accent" @click=${(ev: Event) => { this._assignPlayer(this._databaseSelectedId, matchIndex, 0); ev.stopPropagation(); }}>
+            マッチ${matchNumber} 1Pにセット
+          </fluent-button>
+          <fluent-button appearance="accent" @click=${(ev: Event) => { this._assignPlayer(this._databaseSelectedId, matchIndex, 1); ev.stopPropagation(); }}>
+            マッチ${matchNumber} 2Pにセット
+          </fluent-button>
+          `
+        })}
       </div>
     </wakutet-section>
     `;

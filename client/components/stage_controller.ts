@@ -1,15 +1,16 @@
 import * as denocg from "denocg/client";
 import { DenoCGContext, denocgContext } from "../denocg_context.ts";
 import { css, html, LitElement } from "lit";
-import { customElement, state } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import { map } from "lit/directives/map.js";
 import { consume } from "@lit-labs/context";
 import "../register_fluentui_elements.ts";
-import { HeartsData, NameData } from "../../common/type_definition.ts";
+import { HeartsData, NameData, type MatchData } from "../../common/type_definition.ts";
 import "./profile_card.ts";
 import { Select } from "@fluentui/web-components";
 import "./section.ts";
+import { MatchDataController } from "../../common/match_data_controller.ts";
 
 @customElement("wakutet-stage-controller")
 export class WakutetStageControllerElement extends LitElement {
@@ -57,12 +58,21 @@ export class WakutetStageControllerElement extends LitElement {
     super();
   }
 
+  @property({ attribute: "num-matches", type: Number })
+  numMatches: number = 1; 
+
+  @property({ attribute: "match-index", type: Number })
+  matchIndex: number = 0; 
+
   // @ts-ignore: ?
   @consume({ context: denocgContext })
   private _denocgContext!: DenoCGContext;
 
   @state()
-  private _playerNames: string[] = ["", ""];
+  private _playerNames: NameData[] = [null, null].map(_ => ({
+    original: "",
+    english: "",
+  }));
   @state()
   private _playerHearts: HeartsData[] = [null, null].map((_) => ({
     lit: 0,
@@ -71,60 +81,43 @@ export class WakutetStageControllerElement extends LitElement {
   @state()
   private _playerProfilesVisible = false;
 
-  private _playerNamesReplicant!: denocg.Replicant<NameData[]>;
-  private _playerHeartsReplicant!: denocg.Replicant<HeartsData[]>;
-  private _playerProfilesVisibleReplicant!: denocg.Replicant<boolean>;
+  private _matchDataController!: MatchDataController;
 
   override async firstUpdated() {
     const client = await this._denocgContext.getClient();
-    this._playerNamesReplicant = await client.getReplicant("playerNames");
-    this._playerHeartsReplicant = await client.getReplicant("playerHearts");
-    this._playerProfilesVisibleReplicant = await client.getReplicant(
-      "playerProfilesVisible",
-    );
-    this._playerNamesReplicant.subscribe((value) => {
-      this._playerNames = value?.map((e) => e.original) ?? ["", ""];
-    });
-    this._playerHeartsReplicant.subscribe((value) => {
-      this._playerHearts = value ??
-        [null, null].map((_) => ({ lit: 0, max: 0 }));
-    });
-    this._playerProfilesVisibleReplicant.subscribe((value) => {
-      this._playerProfilesVisible = value ?? false;
-    });
+    this._matchDataController = new MatchDataController(
+      this.numMatches,
+      async () => await client.getReplicant("matchData"),
+      value => {
+        const matchData = value?.[this.matchIndex];
+        this._playerNames = matchData.playerNames;
+        this._playerHearts = matchData.playerHearts;
+        this._playerProfilesVisible = matchData.playerProfilesVisible;
+      });
   }
 
   private _setNumMaxHearts(numMaxHearts: number) {
-    this._playerHeartsReplicant.setValue([
-      { ...this._playerHearts[0], max: numMaxHearts },
-      { ...this._playerHearts[1], max: numMaxHearts },
-    ]);
+    this._matchDataController.setNumMaxHearts(this.matchIndex, numMaxHearts);
   }
 
   private _changeNumLitHearts(playerIndex: number, delta: number) {
-    const playerHearts = [...this._playerHearts];
-    playerHearts[playerIndex] = {
-      ...playerHearts[playerIndex],
-      lit: Math.min(
-        Math.max(playerHearts[playerIndex].lit + delta, 0),
-        playerHearts[playerIndex].max,
-      ),
-    };
-    this._playerHeartsReplicant.setValue(playerHearts);
+    const newValue = this._playerHearts[playerIndex].lit + delta;
+    this._matchDataController.setNumLitHearts(this.matchIndex, playerIndex, newValue);
   }
 
   private _setPlayerProfilesVisible(visible: boolean) {
-    this._playerProfilesVisibleReplicant.setValue(visible);
+    this._matchDataController.setPlayerProfilesVisible(this.matchIndex, visible);
   }
 
   override render() {
+    const matchNumber = Number(this.matchIndex) + 1;
     const numMaxHearts = Math.min(
       Math.max(this._playerHearts[0]?.max ?? 0, 0),
       5,
     );
     return html`
     <wakutet-section>
-      <div slot="header">現在のプレイヤー</div>
+      <div slot="header">マッチ${matchNumber}</div>
       <div slot="content">
         <div>
           <fluent-checkbox ?checked=${this._playerProfilesVisible} @change=${(
@@ -148,7 +141,7 @@ export class WakutetStageControllerElement extends LitElement {
         <hr>
         <div class="grid">
           <div style="display: contents">
-            ${map(this._playerNames, (e) => html`<div class="name">${e != "" ? e : "[空席]"}</div>`)}
+            ${map(this._playerNames, (e) => html`<div class="name">${e.original != "" ? e.original : "[空席]"}</div>`)}
           </div>
           <div style="display: contents">
             ${

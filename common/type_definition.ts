@@ -20,10 +20,15 @@ export type HeartsData = {
 };
 
 export type ProfileData = {
-  name: string;
-  englishName: string | null;
   entries: [string, string][];
 };
+
+export type MatchData = {
+  playerNames: NameData[];
+  playerHearts: HeartsData[];
+  playerProfiles: ProfileData[];
+  playerProfilesVisible: boolean;
+}
 
 export type QualifierRankingEntry = {
   place: number;
@@ -39,10 +44,7 @@ export type TypeDefinition = {
     titleScreenName: string;
     matchName: string;
     commentaryNames: string[];
-    playerNames: [NameData, NameData];
-    playerHearts: [HeartsData, HeartsData];
-    playerProfiles: [ProfileData, ProfileData];
-    playerProfilesVisible: boolean;
+    matchData: MatchData[];
     qualifierRanking: QualifierRankingEntry[];
 
     // dashboard only

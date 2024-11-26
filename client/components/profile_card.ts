@@ -1,4 +1,4 @@
-import { ProfileData } from "../../common/type_definition.ts";
+import { ProfileData, type NameData } from "../../common/type_definition.ts";
 import { commonColors } from "../common_values.js";
 import { css, html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
@@ -68,6 +68,9 @@ export class WakutetProfileCardElement extends LitElement {
   `;
 
   @property()
+  name?: NameData;
+
+  @property()
   profile?: ProfileData;
 
   constructor() {
@@ -75,12 +78,13 @@ export class WakutetProfileCardElement extends LitElement {
   }
 
   override render() {
+    const name = this.name ?? { original: "", english: "" };
     const profile = this.profile ?? { name: "", englishName: null, entries: [] };
     return html`
     <div class="container">
-      <div class="name">${profile.name}</div>
-      <div class="english-name">${profile.englishName}</div>
-      <div class=${classMap({ "name-border": true, "name-border-hidden": profile.name == "" })}></div>
+      <div class="name">${name.original}</div>
+      <div class="english-name">${name.english}</div>
+      <div class=${classMap({ "name-border": true, "name-border-hidden": name.original == "" })}></div>
       <dl>
       ${
       map(profile.entries, (e) =>
