@@ -14,6 +14,7 @@ const options: esbuild.BuildOptions = {
     "./client/qualifier_ranking.ts",
     "./client/bracket.ts",
     "./client/play_screen.ts",
+    "./client/player_introduction.ts",
   ],
   platform: "browser",
   bundle: true,

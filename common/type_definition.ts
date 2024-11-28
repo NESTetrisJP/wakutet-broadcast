@@ -38,6 +38,11 @@ export type QualifierRankingEntry = {
   numMaxout: number;
 };
 
+export type PlayerIntroductionData = {
+  name: NameData;
+  profile: ProfileData;
+}
+
 export type TypeDefinition = {
   replicants: {
     currentSceneName: string;
@@ -46,6 +51,7 @@ export type TypeDefinition = {
     commentaryNames: string[];
     matchData: MatchData[];
     qualifierRanking: QualifierRankingEntry[];
+    activePlayerIntroduction?: PlayerIntroductionData;
 
     // dashboard only
     playerDatabase: PlayerDatabaseEntry[];

@@ -9,6 +9,7 @@ import {
   NameData,
   PlayerDatabaseEntry,
   ProfileData,
+  type PlayerIntroductionData,
 } from "../../common/type_definition.ts";
 import "./profile_card.ts";
 import "./section.ts";
@@ -75,6 +76,7 @@ export class WakutetPlayerAssignerElement extends LitElement {
   @state()
   private _playerProfileHiddenEntries: Record<string, string[]> = {};
 
+  private _activePlayerIntroductionReplicant!: denocg.Replicant<PlayerIntroductionData | undefined>;
   private _matchDataController!: MatchDataController;
   private _playerProfileHiddenEntriesReplicant!: denocg.Replicant<
     Record<string, string[]>
@@ -86,6 +88,9 @@ export class WakutetPlayerAssignerElement extends LitElement {
     playerDatabaseReplicant.subscribe((value) => {
       this._playerDatabase = value ?? [];
     });
+    this._activePlayerIntroductionReplicant = await client.getReplicant(
+      "activePlayerIntroduction",
+    );
     this._matchDataController = new MatchDataController(
       this.numMatches,
       async () => await client.getReplicant("matchData"),
@@ -146,6 +151,16 @@ export class WakutetPlayerAssignerElement extends LitElement {
     this._matchDataController.setPlayerProfile(matchIndex, playerIndex, profileData);
   }
 
+  private _assignPlayerToIntroduction(id: number) {
+    const nameData = this._constructNameData(
+      this._playerDatabase.find((e) => e.id == id) ?? null,
+    );
+    const profileData = this._constructProfileData(
+      this._playerDatabase.find((e) => e.id == id) ?? null,
+    );
+    this._activePlayerIntroductionReplicant.setValue({ name: nameData, profile: profileData });
+  }
+
   private _getProfileEntryVisibility(
     playerName: string,
     entryName: string,
@@ -183,6 +198,9 @@ export class WakutetPlayerAssignerElement extends LitElement {
     const selectedDatabaseEntry = this._playerDatabase.find((e) =>
       e.id == this._databaseSelectedId
     );
+    const previewName = selectedDatabaseEntry != null
+      ? this._constructNameData(selectedDatabaseEntry)
+      : null;
     const previewProfile = selectedDatabaseEntry != null
       ? this._constructProfileData(selectedDatabaseEntry)
       : null;
@@ -213,7 +231,7 @@ export class WakutetPlayerAssignerElement extends LitElement {
           </div>
           <div class="profile-card-preview">
             <div>
-              <wakutet-profile-card .profile=${previewProfile}></wakutet-profile-card>
+              <wakutet-profile-card .name=${previewName} .profile=${previewProfile}></wakutet-profile-card>
             </div>
           </div>
         </div>
@@ -228,6 +246,9 @@ export class WakutetPlayerAssignerElement extends LitElement {
           </fluent-button>
           `
         })}
+        <fluent-button appearance="accent" @click=${(ev: Event) => { this._assignPlayerToIntroduction(this._databaseSelectedId); ev.stopPropagation(); }}>
+          プレイヤー紹介画面にセット 
+        </fluent-button>
       </div>
     </wakutet-section>
     `;
