@@ -39,8 +39,7 @@ export type QualifierRankingEntry = {
 };
 
 export type PlayerIntroductionData = {
-  name: NameData;
-  profile: ProfileData;
+  id: number;
 }
 
 export type TypeDefinition = {

@@ -152,13 +152,12 @@ export class WakutetPlayerAssignerElement extends LitElement {
   }
 
   private _assignPlayerToIntroduction(id: number) {
-    const nameData = this._constructNameData(
-      this._playerDatabase.find((e) => e.id == id) ?? null,
-    );
-    const profileData = this._constructProfileData(
-      this._playerDatabase.find((e) => e.id == id) ?? null,
-    );
-    this._activePlayerIntroductionReplicant.setValue({ name: nameData, profile: profileData });
+    const databaseEntry = this._playerDatabase.find((e) => e.id == id);
+    if (databaseEntry != null) {
+      this._activePlayerIntroductionReplicant.setValue({ id: databaseEntry.id });
+    } else {
+      this._activePlayerIntroductionReplicant.setValue(undefined);
+    }
   }
 
   private _getProfileEntryVisibility(
