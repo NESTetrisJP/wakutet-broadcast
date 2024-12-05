@@ -126,8 +126,10 @@ export class WakutetDashboardElement extends LitElement {
         <div slot="header">フッター</div>
         <div slot="content">
           <fluent-text-field id="match-name" value=${this._matchName}>試合名</fluent-text-field>
-          <fluent-text-field id="commentary-1" value=${live(this._commentaryNames[0] ?? "")}>実況1</fluent-text-field>
-          <fluent-text-field id="commentary-2" value=${live(this._commentaryNames[1] ?? "")}>実況2</fluent-text-field>
+          <div style="display: inline-block">
+            <fluent-text-field id="commentary-1" value=${live(this._commentaryNames[0] ?? "")}>実況1</fluent-text-field>
+            <fluent-text-field id="commentary-2" value=${live(this._commentaryNames[1] ?? "")}>実況2</fluent-text-field>
+          </div>
           <br>
           <fluent-button appearance="accent" @click=${() => this._setFooter()}>更新</fluent-button>
         </div>
