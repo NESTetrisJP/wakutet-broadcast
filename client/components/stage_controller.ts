@@ -1,4 +1,3 @@
-import * as denocg from "denocg/client";
 import { DenoCGContext, denocgContext } from "../denocg_context.ts";
 import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
@@ -6,7 +5,7 @@ import { classMap } from "lit/directives/class-map.js";
 import { map } from "lit/directives/map.js";
 import { consume } from "@lit-labs/context";
 import "../register_fluentui_elements.ts";
-import { HeartsData, NameData, type MatchData } from "../../common/type_definition.ts";
+import { HeartsData, type PlayerDatabaseEntry } from "../../common/type_definition.ts";
 import "./profile_card.ts";
 import { Select } from "@fluentui/web-components";
 import "./section.ts";
@@ -15,22 +14,11 @@ import { MatchDataController } from "../../common/match_data_controller.ts";
 @customElement("wakutet-stage-controller")
 export class WakutetStageControllerElement extends LitElement {
   static override styles = css`
-  .grid {
-    display: grid;
-    grid-template-columns: 200px 200px;
-    gap: 0 20px;
-  }
-  .name:nth-child(1) {
-    grid-area: 1 / 1;
-  }
-  .name:nth-child(2) {
-    grid-area: 1 / 2;
-  }
-  .hearts-controller:nth-child(1) {
-    grid-area: 2 / 1;
-  }
-  .hearts-controller:nth-child(2) {
-    grid-area: 2 / 2;
+  .players {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
   }
 
   .name {
@@ -69,31 +57,63 @@ export class WakutetStageControllerElement extends LitElement {
   private _denocgContext!: DenoCGContext;
 
   @state()
-  private _playerNames: NameData[] = [null, null].map(_ => ({
-    original: "",
-    english: "",
-  }));
+  private _playerDatabase: PlayerDatabaseEntry[] = [];
+
   @state()
   private _playerHearts: HeartsData[] = [null, null].map((_) => ({
     lit: 0,
     max: 0,
   }));
   @state()
-  private _playerProfilesVisible = false;
+  private _playerIds: number[] = [-1, -1];
+  @state()
+  private _playerProfilesPattern = -1;
 
   private _matchDataController!: MatchDataController;
 
   override async firstUpdated() {
     const client = await this._denocgContext.getClient();
+    const playerDatabaseReplicant = await client.getReplicant("playerDatabase");
+    playerDatabaseReplicant.subscribe((value) => {
+      this._playerDatabase = value ?? [];
+    });
     this._matchDataController = new MatchDataController(
       this.numMatches,
       async () => await client.getReplicant("matchData"),
       value => {
         const matchData = value?.[this.matchIndex];
-        this._playerNames = matchData.playerNames;
         this._playerHearts = matchData.playerHearts;
-        this._playerProfilesVisible = matchData.playerProfilesVisible;
+        this._playerIds = matchData.playerIds.map(e => e ?? -1);
+        this._playerProfilesPattern = matchData.playerProfilesVisible ? matchData.playerProfilesPatternIndex : -1;
       });
+  }
+
+  private _setPlayerId(playerIndex: number, id: number) {
+    if (id == -1) {
+      this._matchDataController.setPlayerName(this.matchIndex, playerIndex, { original: "", english: null });
+      this._matchDataController.setPlayerProfile(this.matchIndex, playerIndex, { entries: [] });
+      this._matchDataController.setPlayerIds(this.matchIndex, playerIndex, undefined);
+    } else {
+      // TODO: actual pattern from database
+      const player = this._playerDatabase.find(e => e.id == id)!;
+      this._matchDataController.setPlayerName(this.matchIndex, playerIndex, { original: player.name, english: player.englishName });
+      this._matchDataController.setPlayerProfile(this.matchIndex, playerIndex, { entries: player.profileEntries });
+      this._matchDataController.setPlayerIds(this.matchIndex, playerIndex, id);
+    }
+  }
+
+  private _setPlayerProfilesPattern(pattern: number) {
+    if (pattern == -1) {
+      this._matchDataController.setPlayerProfilesVisible(this.matchIndex, false);
+    } else {
+      [0, 1].forEach(playerIndex => {
+        // TODO: actual pattern from database
+        const player = this._playerDatabase.find(e => e.id == this._playerIds[playerIndex]);
+        this._matchDataController.setPlayerProfile(this.matchIndex, playerIndex, { entries: player?.profileEntries ?? [] });
+      });
+      this._matchDataController.setPlayerProfilesVisible(this.matchIndex, true);
+      this._matchDataController.setPlayerProfilesPatternIndex(this.matchIndex, pattern);
+    }
   }
 
   private _setNumMaxHearts(numMaxHearts: number) {
@@ -105,31 +125,35 @@ export class WakutetStageControllerElement extends LitElement {
     this._matchDataController.setNumLitHearts(this.matchIndex, playerIndex, newValue);
   }
 
-  private _setPlayerProfilesVisible(visible: boolean) {
-    this._matchDataController.setPlayerProfilesVisible(this.matchIndex, visible);
-  }
-
   override render() {
     const matchNumber = Number(this.matchIndex) + 1;
     const numMaxHearts = Math.min(
       Math.max(this._playerHearts[0]?.max ?? 0, 0),
       5,
     );
+    // deno-fmt-ignore
     return html`
     <wakutet-section>
       <div slot="header">マッチ${matchNumber}</div>
       <div slot="content">
         <div>
-          <fluent-checkbox ?checked=${this._playerProfilesVisible} @change=${(
-          ev: Event,
-        ) =>
-          this._setPlayerProfilesVisible(
-            (ev.target as HTMLInputElement).checked,
-          )}>プロフィールを表示</fluent-checkbox>
+          <fluent-select
+            value=${this._playerProfilesPattern}
+            @change=${(ev: Event) => this._setPlayerProfilesPattern(Number((ev.target as Select).value))}
+          >
+            <fluent-option value="-1">プロフィール非表示</fluent-option>
+            <fluent-option value="0">パターン1プロフィール</fluent-option>
+            <fluent-option value="1">パターン2プロフィール</fluent-option>
+            <fluent-option value="2">パターン3プロフィール</fluent-option>
+            <fluent-option value="3">パターン4プロフィール</fluent-option>
+            <fluent-option value="4">パターン5プロフィール</fluent-option>
+          </fluent-select>
         </div>
         <div>
-          <fluent-select value=${numMaxHearts} @change=${(ev: Event) =>
-          this._setNumMaxHearts(Number((ev.target as Select).value))}>
+          <fluent-select
+            value=${numMaxHearts}
+            @change=${(ev: Event) => this._setNumMaxHearts(Number((ev.target as Select).value))}
+          >
             <fluent-option value="0">ハート非表示</fluent-option>
             <fluent-option value="1">1本先取</fluent-option>
             <fluent-option value="2">2本先取</fluent-option>
@@ -139,36 +163,40 @@ export class WakutetStageControllerElement extends LitElement {
           </fluent-select>
         </div>
         <hr>
-        <div class="grid">
-          <div style="display: contents">
-            ${map(this._playerNames, (e) => html`<div class="name">${e.original != "" ? e.original : "[空席]"}</div>`)}
-          </div>
-          <div style="display: contents">
-            ${
-            map(this._playerHearts, (e, i) =>
-            html`
-            <div class="hearts-controller">
-              <div>
-                ${map([...new Array(this._playerHearts[i].max)], (_, j) =>
-                  html`<span class=${
-                    classMap({
-                      "heart": true,
-                      "heart-lit": j < this._playerHearts[i].lit,
-                    })
-                  }>♥</span>`)
-                }
-              </div>
-              <div>
-                <fluent-button @click=${() =>
-                this._changeNumLitHearts(i, -Infinity)}>0</fluent-button>
-                <fluent-button @click=${() =>
-                this._changeNumLitHearts(i, -1)}>-</fluent-button>
-                <fluent-button @click=${() =>
-                this._changeNumLitHearts(i, +1)}>+</fluent-button>
+        <div class="players">
+          ${map([0, 1], playerIndex => {
+            return html`
+            <div class="player">
+              <fluent-select
+                value=${this._playerIds[playerIndex]}
+                @change=${(ev: Event) => this._setPlayerId(playerIndex, Number((ev.target as Select).value))}
+              >
+                <fluent-option value="-1">[空席]</fluent-option>
+                ${map(this._playerDatabase, entry => html`<fluent-option value="${entry.id}">${entry.name}</fluent-option>`)}
+              </fluent-select>
+              <div class="hearts-controller">
+                <div>
+                  ${map([...new Array(this._playerHearts[playerIndex].max)], (_, j) =>
+                    html`<span class=${
+                      classMap({
+                        "heart": true,
+                        "heart-lit": j < this._playerHearts[playerIndex].lit,
+                      })
+                    }>♥</span>`)
+                  }
+                </div>
+                <div>
+                  <fluent-button @click=${() =>
+                  this._changeNumLitHearts(playerIndex, -Infinity)}>0</fluent-button>
+                  <fluent-button @click=${() =>
+                  this._changeNumLitHearts(playerIndex, -1)}>-</fluent-button>
+                  <fluent-button @click=${() =>
+                  this._changeNumLitHearts(playerIndex, +1)}>+</fluent-button>
+                </div>
               </div>
             </div>
-            `)}
-          </div>
+            `
+          })}
         </div>
       </div>
     </wakutet-section>

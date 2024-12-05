@@ -26,7 +26,9 @@ export class MatchDataController {
         playerHearts: [undefined, undefined].map(_ => ({ lit: 0, max: 0 })),
         playerProfiles: [undefined, undefined].map(_ => ({ entries: [] })),
         playerProfilesVisible: false,
-      })
+        playerIds: [undefined, undefined],
+        playerProfilesPatternIndex: 0,
+      });
     }
     this.#currentValue = value;
     this.#onUpdate(this.#currentValue);
@@ -67,5 +69,17 @@ export class MatchDataController {
 
   setPlayerProfilesVisible(matchIndex: number, visible: boolean) {
     this.#patch(matchIndex, { playerProfilesVisible: visible });
+  }
+
+  /** dashboard only. be consistent with playerNames */
+  setPlayerIds(matchIndex: number, playerIndex: number, playerId: number | undefined) {
+    const newValue = [...this.#currentValue[matchIndex].playerIds];
+    newValue[playerIndex] = playerId;
+    this.#patch(matchIndex, { playerIds: newValue });
+  }
+
+  /** dashboard only. be consistent with playerProfiles */
+  setPlayerProfilesPatternIndex(matchIndex: number, patternIndex: number) {
+    this.#patch(matchIndex, { playerProfilesPatternIndex: patternIndex });
   }
 }

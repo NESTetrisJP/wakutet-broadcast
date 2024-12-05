@@ -28,6 +28,10 @@ export type MatchData = {
   playerHearts: HeartsData[];
   playerProfiles: ProfileData[];
   playerProfilesVisible: boolean;
+
+  // dashboard only
+  playerIds: (number | undefined)[];
+  playerProfilesPatternIndex: number;
 }
 
 export type QualifierRankingEntry = {
