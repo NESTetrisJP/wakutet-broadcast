@@ -10,11 +10,9 @@ import {
   DenoCGContext,
   denocgContext,
 } from "./denocg_context.ts";
-import { WakutetStageControllerElement } from "./components/stage_controller.ts";
+import "./components/player_introduction_controller.ts";
 import "./components/stage_controller.ts";
-import { WakutetPlayerAssignerElement } from "./components/player_assigner.ts";
 import "./components/player_assigner.ts";
-import { WakutetSectionElement } from "./components/section.ts";
 import "./components/section.ts";
 import { NumberField, TextField } from "@fluentui/web-components";
 
@@ -107,7 +105,12 @@ export class WakutetDashboardElement extends LitElement {
         <div slot="content">
           <fluent-button @click=${() => this._changeScene("title")}>タイトル</fluent-button>
           <fluent-button @click=${() => this._changeScene("commentary")}>実況席</fluent-button>
-          <fluent-button @click=${() => this._changeScene("play_screen")}>ゲーム画面</fluent-button>
+          <fluent-button @click=${() => this._changeScene("player_introduction")}>プレイヤー紹介</fluent-button>
+          <span style="display: inline-block">
+            <fluent-button @click=${() => this._changeScene("play_screen_match12")}>ゲーム画面 (1, 2)</fluent-button>
+            <fluent-button @click=${() => this._changeScene("play_screen_match1")}>ゲーム画面 (1)</fluent-button>
+            <fluent-button @click=${() => this._changeScene("play_screen_match2")}>ゲーム画面 (2)</fluent-button>
+          </span>
           <fluent-button @click=${() => this._changeScene("qualifier_ranking")}>予選ランキング</fluent-button>
           <fluent-button @click=${() => this._changeScene("bracket")}>トーナメント表</fluent-button>
         </div>
@@ -122,6 +125,7 @@ export class WakutetDashboardElement extends LitElement {
           <fluent-button @click=${() => this._startCountdown()}>セット</fluent-button>
         </div>
       </wakutet-section>
+      <wakutet-player-introduction-controller></wakutet-player-introduction-controller>
       <wakutet-section>
         <div slot="header">フッター</div>
         <div slot="content">
@@ -138,6 +142,21 @@ export class WakutetDashboardElement extends LitElement {
         return html`<wakutet-stage-controller num-matches=${numMatches} match-index=${matchIndex}></wakutet-stage-controller>`;
       })}
       <wakutet-player-assigner num-matches=${numMatches}></wakutet-player-assigner>
+      <wakutet-section>
+        <div slot="header">その他リンク</div>
+        <div slot="content">
+          <a href="/profile_editor.html" target="_blank">プロフィールエディタ</a>
+          <a href="/title.html" target="_blank">タイトルCG</a>
+          <a href="/commentary.html" target="_blank">実況席CG</a>
+          <a href="/player_introduction.html" target="_blank">プレイヤー紹介CG</a>
+          <a href="http://localhost:5000/view/wakutet_2matches/PLAYER1?am=1,2" target="_blank">ゲーム画面CG (1, 2)</a>
+          <a href="http://localhost:5000/view/wakutet_2matches/PLAYER1?am=1" target="_blank">ゲーム画面CG (1)</a>
+          <a href="http://localhost:5000/view/wakutet_2matches/PLAYER1?am=2" target="_blank">ゲーム画面CG (2)</a>
+          <a href="/qualifier_ranking.html" target="_blank">予選ランキングCG</a>
+          <a href="/bracket.html" target="_blank">トーナメント表CG</a>
+          <a href="/footer.html" target="_blank">フッターCG</a>
+        </div>
+      </wakutet-section>
     </div>
     `;
   }
