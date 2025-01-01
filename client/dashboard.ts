@@ -12,7 +12,6 @@ import {
 } from "./denocg_context.ts";
 import "./components/player_introduction_controller.ts";
 import "./components/stage_controller.ts";
-import "./components/player_assigner.ts";
 import "./components/section.ts";
 import { NumberField, TextField } from "@fluentui/web-components";
 
@@ -141,7 +140,6 @@ export class WakutetDashboardElement extends LitElement {
       ${map([...new Array(numMatches)].map((_, i) => i), matchIndex => {
         return html`<wakutet-stage-controller num-matches=${numMatches} match-index=${matchIndex}></wakutet-stage-controller>`;
       })}
-      <wakutet-player-assigner num-matches=${numMatches}></wakutet-player-assigner>
       <wakutet-section>
         <div slot="header">その他リンク</div>
         <div slot="content">

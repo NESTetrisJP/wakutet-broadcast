@@ -40,6 +40,10 @@ export class WakutetStageControllerElement extends LitElement {
   .heart-lit {
     color: red;
   }
+
+  fluent-select {
+    --max-height: 400px;
+  }
   `;
 
   constructor() {
@@ -58,6 +62,8 @@ export class WakutetStageControllerElement extends LitElement {
 
   @state()
   private _playerDatabase: PlayerDatabaseEntry[] = [];
+  @state()
+  private _playerProfilePatterns: Record<number, string[][]> = {};
 
   @state()
   private _playerHearts: HeartsData[] = [null, null].map((_) => ({
@@ -77,6 +83,10 @@ export class WakutetStageControllerElement extends LitElement {
     playerDatabaseReplicant.subscribe((value) => {
       this._playerDatabase = value ?? [];
     });
+    const playerProfilePatternsReplicant = await client.getReplicant("playerProfilePatterns");
+    playerProfilePatternsReplicant.subscribe(value => {
+      this._playerProfilePatterns = value ?? {};
+    });
     this._matchDataController = new MatchDataController(
       this.numMatches,
       async () => await client.getReplicant("matchData"),
@@ -88,16 +98,29 @@ export class WakutetStageControllerElement extends LitElement {
       });
   }
 
+  private _constructPlayerProfileEntries(
+    playerId: number,
+    patternIndex: number,
+  ) {
+    const player = this._playerDatabase.find(e => e.id == playerId) ?? { profileEntries: [] };
+    const visibleEntries = (this._playerProfilePatterns[playerId]?.[patternIndex] ?? []);
+    return player.profileEntries.flatMap(e => {
+      const isVisible = visibleEntries.indexOf(e[0]) >= 0;
+      return isVisible ? [e] : [];
+    });
+  }
+
   private _setPlayerId(playerIndex: number, id: number) {
     if (id == -1) {
       this._matchDataController.setPlayerName(this.matchIndex, playerIndex, { original: "", english: null });
       this._matchDataController.setPlayerProfile(this.matchIndex, playerIndex, { entries: [] });
       this._matchDataController.setPlayerIds(this.matchIndex, playerIndex, undefined);
     } else {
-      // TODO: actual pattern from database
       const player = this._playerDatabase.find(e => e.id == id)!;
       this._matchDataController.setPlayerName(this.matchIndex, playerIndex, { original: player.name, english: player.englishName });
-      this._matchDataController.setPlayerProfile(this.matchIndex, playerIndex, { entries: player.profileEntries });
+      if (this._playerProfilesPattern >= 0) {
+        this._matchDataController.setPlayerProfile(this.matchIndex, playerIndex, { entries: this._constructPlayerProfileEntries(player.id, this._playerProfilesPattern) });
+      }
       this._matchDataController.setPlayerIds(this.matchIndex, playerIndex, id);
     }
   }
@@ -107,9 +130,10 @@ export class WakutetStageControllerElement extends LitElement {
       this._matchDataController.setPlayerProfilesVisible(this.matchIndex, false);
     } else {
       [0, 1].forEach(playerIndex => {
-        // TODO: actual pattern from database
         const player = this._playerDatabase.find(e => e.id == this._playerIds[playerIndex]);
-        this._matchDataController.setPlayerProfile(this.matchIndex, playerIndex, { entries: player?.profileEntries ?? [] });
+        if (player != null) {
+          this._matchDataController.setPlayerProfile(this.matchIndex, playerIndex, { entries: this._constructPlayerProfileEntries(player.id, pattern) });
+        }
       });
       this._matchDataController.setPlayerProfilesVisible(this.matchIndex, true);
       this._matchDataController.setPlayerProfilesPatternIndex(this.matchIndex, pattern);

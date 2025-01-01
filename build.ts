@@ -15,6 +15,7 @@ const options: esbuild.BuildOptions = {
     "./client/bracket.ts",
     "./client/play_screen.ts",
     "./client/player_introduction.ts",
+    "./client/profile_editor.ts",
   ],
   platform: "browser",
   bundle: true,

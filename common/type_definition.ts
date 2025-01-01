@@ -58,7 +58,7 @@ export type TypeDefinition = {
 
     // dashboard only
     playerDatabase: PlayerDatabaseEntry[];
-    playerProfileHiddenEntries: Record<string, string[]>;
+    playerProfilePatterns: Record<number, string[][]>;
   };
 
   messages: {
