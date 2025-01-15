@@ -95,6 +95,12 @@ export class WakutetDashboardElement extends LitElement {
     this._commentaryNames = commentaryNames;
   }
 
+  private async _setActiveSponsorId(id: string) {
+    const client = await this._denocgContext.getClient();
+    const activeSponsorIdReplicant = await client.getReplicant("activeSponsorId");
+    activeSponsorIdReplicant.setValue(id);
+  }
+
   override render() {
     // deno-fmt-ignore
     return html`
@@ -112,6 +118,8 @@ export class WakutetDashboardElement extends LitElement {
           </span>
           <fluent-button @click=${() => this._changeScene("qualifier_ranking")}>予選ランキング</fluent-button>
           <fluent-button @click=${() => this._changeScene("bracket")}>トーナメント表</fluent-button>
+          <fluent-button @click=${() => this._changeScene("sponsor")}>スポンサー紹介</fluent-button>
+          <fluent-button @click=${() => this._changeScene("sponsor_browser")}>スポンサーWeb</fluent-button>
         </div>
       </wakutet-section>
       <wakutet-section>
@@ -141,6 +149,13 @@ export class WakutetDashboardElement extends LitElement {
         return html`<wakutet-stage-controller num-matches=${numMatches} match-index=${matchIndex}></wakutet-stage-controller>`;
       })}
       <wakutet-section>
+        <div slot="header">スポンサー紹介内容</div>
+        <div slot="content">
+          <fluent-button @click=${() => this._setActiveSponsorId("1")}>Enhance</fluent-button>
+          <fluent-button @click=${() => this._setActiveSponsorId("2")}>無敵時間</fluent-button>
+        </div>
+      </wakutet-section>
+      <wakutet-section>
         <div slot="header">その他リンク</div>
         <div slot="content">
           <a href="/profile_editor.html" target="_blank">プロフィールエディタ</a>
@@ -152,6 +167,7 @@ export class WakutetDashboardElement extends LitElement {
           <a href="http://localhost:5000/view/wakutet_2matches/PLAYER1?am=2" target="_blank">ゲーム画面CG (2)</a>
           <a href="/qualifier_ranking.html" target="_blank">予選ランキングCG</a>
           <a href="/bracket.html" target="_blank">トーナメント表CG</a>
+          <a href="/sponsor.html" target="_blank">スポンサー紹介CG</a>
           <a href="/footer.html" target="_blank">フッターCG</a>
         </div>
       </wakutet-section>

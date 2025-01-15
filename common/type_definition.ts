@@ -55,6 +55,7 @@ export type TypeDefinition = {
     matchData: MatchData[];
     qualifierRanking: QualifierRankingEntry[];
     activePlayerIntroduction?: PlayerIntroductionData;
+    activeSponsorId?: string;
 
     // dashboard only
     playerDatabase: PlayerDatabaseEntry[];

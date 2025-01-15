@@ -37,12 +37,20 @@ export class WakutetFooterElement extends LitElement {
     line-height: 70px;
   }
 
-  .sponsor {
+  .sponsor-1 {
+    position: absolute;
+    right: 260px;
+    width: 240px;
+    height: 80px;
+    background: url("images/footer_sponsors/1.png");
+  }
+
+  .sponsor-2 {
     position: absolute;
     right: 0px;
     width: 240px;
     height: 80px;
-    background: url("images/sponsor_1.png");
+    background: url("images/footer_sponsors/2.png");
   }
   `;
 
@@ -80,7 +88,8 @@ export class WakutetFooterElement extends LitElement {
         <div class="match-name" style=${styleMap({ display: this._matchName == null ? "none" : null })}>${this._matchName}</div>
         <div class="commentary" style=${styleMap({ display: this._commentaryNames.length == 0 ? "none" : null })}>実況：${this._commentaryNames.join("・")}</div>
       </div>
-      <div class="sponsor"></div>
+      <div class="sponsor-1"></div>
+      <div class="sponsor-2"></div>
     </div>
     `;
   }

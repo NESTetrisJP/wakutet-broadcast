@@ -16,6 +16,7 @@ const options: esbuild.BuildOptions = {
     "./client/play_screen.ts",
     "./client/player_introduction.ts",
     "./client/profile_editor.ts",
+    "./client/sponsor.ts",
   ],
   platform: "browser",
   bundle: true,
