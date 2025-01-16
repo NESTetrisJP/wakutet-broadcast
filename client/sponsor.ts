@@ -17,7 +17,7 @@ export class WakutetSponsorElement extends LitElement {
 
   img {
     width: 1920px;
-    width: 1080px;
+    height: 1080px;
   }
   `
 
